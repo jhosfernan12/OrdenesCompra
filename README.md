@@ -31,7 +31,7 @@ Crea una base de datos en phpMyAdmin e importa el archivo .sql si está disponib
 Configura el archivo de conexión a la base de datos (config.php o similar) con tus credenciales locales.
 
 ##🤝 Cómo Contribuir
-###1. Realiza un fork del repositorio
+### 1. Realiza un fork del repositorio
 Entra al repositorio original en GitHub.
 
 Haz clic en Fork (arriba a la derecha) para crear una copia en tu cuenta.
