@@ -27,10 +27,16 @@ cd OrdenesCompra
 Abre XAMPP y asegúrate de iniciar Apache y MySQL.
 
 Copia el proyecto dentro de la carpeta htdocs de XAMPP.
-Crea una base de datos en phpMyAdmin e importa el archivo .sql si está disponible en el repositorio.
-Configura el archivo de conexión a la base de datos (config.php o similar) con tus credenciales locales.
+Abre el login:
+```bash
+http://127.0.0.1/OrdenesCompra/screens/login.html
+```
+Automaticamente se creara la base de datos, puedes verificar su existencia en:
+```bash
+http://127.0.0.1/phpmyadmin/
+```
 
-##🤝 Cómo Contribuir
+## Cómo Contribuir
 ### 1. Realiza un fork del repositorio
 Entra al repositorio original en GitHub.
 
