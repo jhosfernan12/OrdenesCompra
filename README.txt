@@ -1,21 +1,7 @@
 # 📦 Sistema de Gestión de Órdenes de Compra
 
-Aplicación de escritorio en Python con interfaz gráfica (Tkinter) y base de datos SQLite. Permite gestionar usuarios, proveedores, productos y órdenes de compra.
 
----
-
-## 📁 Estructura del Proyecto
-
-mi-proyecto/
-├── databases/ # Scripts para la base de datos
-├── screens/ # Pantallas de la interfaz
-├── main.py # Archivo principal del programa
-├── requirements.txt # Dependencias del proyecto
-└── README.md # Este archivo
-
-## ✅ Requisitos
-
-- Python 3.10 o superior
+- Xammp
 - Git (para clonar el repositorio)
 
 
