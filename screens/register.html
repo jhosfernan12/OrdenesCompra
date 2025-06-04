@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro</title>
+  <link rel="stylesheet" href="../UI/styles.css" />
+  <style>
+    @keyframes fadeOutDown {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+    }
+
+    .message {
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      animation: fadeInUp 0.6s ease-out;
+      transition: opacity 0.3s ease;
+      font-size: 0.95em;
+      max-width: 100%;
+      word-wrap: break-word;
+    }
+
+    .error {
+      background-color: #fdecea;
+      color: #b71c1c;
+      border: 1px solid #f5c6cb;
+    }
+
+    .success, .exito {
+      background-color: #e6f9ec;
+      color: #1b5e20;
+      border: 1px solid #a5d6a7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper animate">
+    <h2>Registro</h2>
+
+    <div id="response-message" class="message" style="display: none;"></div>
+
+    <form method="POST" action="../actions/register.php">
+      <input type="text" id="usuario" name="usuario" placeholder="Nombre de Usuario" required /><br />
+      <div class="password-container">
+        <input type="password" id="contrasena" name="contrasena" placeholder="Contraseña" required />
+        <img
+          src="../UI/assets/eyeclosed.png"
+          id="toggle-password"
+          alt="Mostrar contraseña"
+        />
+      </div>
+      <input type="email" id="correo" name="correo" placeholder="Correo" required /><br />
+      <input type="submit" value="Registrar" />
+    </form>
+
+    <p>¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a></p>
+  </div>
+
+  <script>
+    // Mostrar/Ocultar contraseña
+    const passwordInput = document.getElementById("contrasena");
+    const togglePassword = document.getElementById("toggle-password");
+    let isPasswordVisible = false;
+
+    togglePassword.addEventListener("click", () => {
+      isPasswordVisible = !isPasswordVisible;
+      passwordInput.type = isPasswordVisible ? "text" : "password";
+      togglePassword.src = isPasswordVisible
+        ? "../UI/assets/eyeallowed.png"
+        : "../UI/assets/eyeclosed.png";
+    });
+
+    // Mostrar mensaje dinámico
+    const params = new URLSearchParams(window.location.search);
+    const mensaje = params.get("mensaje");
+    const tipo = params.get("tipo"); // 'exito' o 'error'
+    const msgDiv = document.getElementById("response-message");
+
+    if (mensaje && tipo) {
+      msgDiv.textContent = decodeURIComponent(mensaje);
+      msgDiv.classList.add(tipo === "exito" ? "success" : "error");
+      msgDiv.style.display = "block";
+
+      setTimeout(() => {
+        msgDiv.style.animation = "fadeOutDown 0.6s ease-out forwards";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
