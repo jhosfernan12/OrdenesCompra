@@ -20,10 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['usuario'] = $user['Nombre'];
                 $_SESSION['rol'] = $user['Rol'];
 
-                // DEBUG: Mostrar sesión y detener
-                //var_dump($_SESSION);
-                //exit();
-
                 // Redirigir al dashboard
                 header("Location: ../screens/dashboard.php");
                 exit();
@@ -45,3 +41,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Iniciar Sesión</h2>
+    <form method="POST" action="login.php">
+        <input type="text" name="usuario" placeholder="Usuario" required><br>
+        <input type="password" name="contrasena" placeholder="Contraseña" required><br>
+        <input type="submit" value="Iniciar sesión"><br>
+    </form>
+    
+    <!-- Enlace para recuperar la contraseña -->
+    <p><a href="recoverpass.php">¿Olvidaste tu contraseña?</a></p>
+    
+    <?php
+    if (isset($_GET['error'])) {
+        echo "<p style='color:red;'>".$_GET['error']."</p>";
+    }
+    ?>
+</body>
+</html>
