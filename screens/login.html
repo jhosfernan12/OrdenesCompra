@@ -28,6 +28,12 @@
       animation: fadeInUp 0.6s ease-out;
       transition: opacity 0.3s ease;
     }
+
+    .forgot-password-link {
+      margin-top: 10px;
+      font-size: 14px;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -46,6 +52,9 @@
       </div>
       <input type="submit" value="Iniciar sesión">
     </form>
+
+    <!-- Enlace para recuperar la contraseña -->
+    <p class="forgot-password-link"><a href="../actions/recoverpass.php">¿Olvidaste tu contraseña?</a></p>
 
     <p>¿No tienes cuenta? <a href="register.html">Registrarse</a></p>
   </div>
@@ -79,37 +88,6 @@
       }, 4000);
     }
   </script>
-
-
-  <div id="error-message" class="message error animate" style="display:none;"></div>
-  <script>
-    // Función para obtener parámetros URL
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    // Mostrar mensaje de error si existe
-    const errorMsg = getQueryParam('error');
-    if (errorMsg) {
-      const errorDiv = document.getElementById('error-message');
-      errorDiv.textContent = decodeURIComponent(errorMsg.replace(/\+/g, ' '));
-      errorDiv.style.display = 'block';
-
-      // Desaparece después de 4 segundos
-      setTimeout(() => {
-        errorDiv.style.opacity = '1';
-        (function fadeOut() {
-          if ((errorDiv.style.opacity -= 0.05) < 0) {
-            errorDiv.style.display = 'none';
-          } else {
-            requestAnimationFrame(fadeOut);
-          }
-        })();
-      }, 4000);
-    }
-  </script>
-
 
 </body>
 </html>
