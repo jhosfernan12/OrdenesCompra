@@ -64,7 +64,7 @@ git commit -m "Corregí el error en el formulario de login"
 ```
 ### 6. Sube tu rama al fork
 ```bash
-git push origin nombre-de-tu-rama
+git push origin nombre-de-tu-rama ( tu nueva branch NO LA ORIGINAL)
 ```
 ### 7. Crea un Pull Request
 Ve a tu repositorio en GitHub.
