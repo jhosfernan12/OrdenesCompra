@@ -42,16 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'jhosfernan12@gmail.com';
-                $mail->Password   = 'wnep orxg bcaf wlnw';      
+                $mail->Username   = 'kauffluss3@gmail.com';
+                $mail->Password   = 'rvsz ujsl cofa vcky';      
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
-                $mail->setFrom('TU_CORREO@gmail.com', 'Sistema de Órdenes');
+                $mail->setFrom('TU_CORREO@gmail.com', 'KaufFluss - Ordenes de Compra');
                 $mail->addAddress($correo);
 
-                $mail->Subject = 'RECUPERACION DE CONTRASENA';
-                $mail->Body    = "Haz clic en el siguiente enlace para recuperar tu contraseña :)\n\n$url";
+                $mail->Subject = 'Recuperacion de Contrasena';
+               $mail->Body = "Estimado usuario,\n\nHaga clic en el siguiente enlace para restablecer su contraseña de forma segura:\n\n$url\n\nSi usted no solicitó este cambio, por favor ignore este mensaje.\n\nAtentamente,\nKaufFluss - Ordenes de Compra";
 
                 $mail->send();
                 
