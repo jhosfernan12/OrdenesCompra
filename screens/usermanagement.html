@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Usuarios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Contenedor principal que contiene todo */
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+    }
+    #app {
+      display: flex;
+      max-width: 900px;
+      margin: 40px auto;
+      height: 600px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* Contenido principal (tabla y botones) */
+    #mainContent {
+      flex: 1;
+      padding: 30px 25px;
+      box-sizing: border-box;
+      transition: flex 0.4s ease;
+      overflow-y: auto;
+      position: relative;
+    }
+    #mainContent.shifted {
+      flex: 0 0 520px; /* se reduce para dar espacio al formulario */
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    button, input[type="submit"] {
+      background-color: #00acc1;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      margin-top: 15px;
+    }
+    button:hover, input[type="submit"]:hover {
+      background-color: #3d8aa1;
+    }
+
+    #dashboardBtn {
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 6px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    thead {
+      background-color: #3d8aa1;
+      color: white;
+    }
+    th, td {
+      padding: 10px 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .editBtn, .deleteBtn {
+      background-color: #28a745;
+      margin-right: 5px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .deleteBtn {
+      background-color: #dc3545;
+    }
+    .editBtn:hover {
+      background-color: #1e7e34;
+    }
+    .deleteBtn:hover {
+      background-color: #bd2130;
+    }
+
+    /* Formulario - inicialmente oculto con ancho 0 */
+    #userFormContainer {
+      flex: 0 0 0;
+      padding: 25px 20px;
+      box-sizing: border-box;
+      background: #f7f7f7;
+      border-left: 1px solid #ccc;
+      overflow-y: auto;
+      transition: flex 0.4s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #userFormContainer.active {
+      flex: 0 0 380px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #userFormContainer h3 {
+      margin-top: 0;
+    }
+
+    #cancelBtn {
+      background-color: #dc3545;
+      margin-left: 10px;
+    }
+    #cancelBtn:hover {
+      background-color: #b71c1c;
+    }
+
+    /* Contenedor para los toasts */
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 320px;
+    }
+
+    /* Estilo general toast */
+    .toast {
+      background: #333;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideIn 0.3s ease forwards;
+      font-size: 0.9rem;
+      user-select: none;
+      position: relative;
+    }
+
+    /* Animación */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 0.95; transform: translateX(0); }
+    }
+
+    .toast.success {
+      background-color: #28a745;
+    }
+    .toast.error {
+      background-color: #dc3545;
+    }
+    .toast.info {
+      background-color: #007bff;
+    }
+    .toast.warning {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .toast button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 15px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    .toast button:hover {
+      background-color: rgba(255 255 255 / 0.3);
+    }
+
+    /* Estilos confirmación en toast */
+    .toast.confirm {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px 20px 10px 20px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .toast.confirm-buttons {
+      align-self: stretch;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      width: 100%;
+    }
+    .toast.confirm button {
+      background-color: rgba(255,255,255,0.2);
+      color: white;
+      font-weight: 600;
+      padding: 8px 14px;
+    }
+    .toast.confirm button.yes:hover {
+      background-color: #28a745;
+    }
+    .toast.confirm button.no:hover {
+      background-color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="mainContent">
+      <h1>Gestión de Usuarios</h1>
+
+      <button id="dashboardBtn">Volver al Dashboard</button>
+
+      <div>
+        <input type="text" id="filterInput" placeholder="Filtrar por nombre o rol" />
+      </div>
+
+      <table id="usersTable" aria-label="Lista de usuarios">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Usuarios listados aquí -->
+        </tbody>
+      </table>
+
+      <button id="addUserBtn">Agregar Usuario</button>
+    </div>
+
+    <div id="userFormContainer" aria-hidden="true">
+      <h3 id="formTitle">Crear Usuario</h3>
+      <form id="userForm" autocomplete="off" novalidate>
+        <input type="hidden" id="userId" name="id" />
+        <label for="userName">
+          Nombre:<br />
+          <input type="text" id="userName" name="name" required autocomplete="off" />
+        </label>
+        <label for="userRole">
+          Rol:<br />
+          <select id="userRole" name="role" required>
+            <option value="">-- Seleccione rol --</option>
+            <option value="Comprador">Comprador</option>
+            <option value="Supervisor">Supervisor</option>
+          </select>
+        </label>
+        <label for="userPassword">
+          Contraseña:<br />
+          <input type="password" id="userPassword" name="password" placeholder="" autocomplete="new-password" />
+        </label>
+        <button type="submit" id="saveBtn">Guardar</button>
+        <button type="button" id="cancelBtn">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contenedor para toasts -->
+  <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const apiUrl = '../actions/usermanagement.php';
+
+    let users = [];
+    let filteredUsers = [];
+
+    const usersTableBody = document.querySelector('#usersTable tbody');
+    const filterInput = document.getElementById('filterInput');
+    const userFormContainer = document.getElementById('userFormContainer');
+    const userForm = document.getElementById('userForm');
+    const formTitle = document.getElementById('formTitle');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const dashboardBtn = document.getElementById('dashboardBtn');
+    const mainContent = document.getElementById('mainContent');
+
+    const toastContainer = document.getElementById('toastContainer');
+
+    // Función para crear toasts
+    function showToast(message, type = 'info', duration = 4000) {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+
+      // Botón cerrar
+      const closeBtn = document.createElement('button');
+      closeBtn.innerHTML = '&times;';
+      closeBtn.setAttribute('aria-label', 'Cerrar mensaje');
+      closeBtn.onclick = () => {
+        toastContainer.removeChild(toast);
+      };
+
+      toast.appendChild(closeBtn);
+      toastContainer.appendChild(toast);
+
+      // Desaparece después de duration ms
+      setTimeout(() => {
+        if (toast.parentNode) toastContainer.removeChild(toast);
+      }, duration);
+    }
+
+    // Función para mostrar confirmación personalizada
+    // Retorna Promise que se resuelve true o false según respuesta del usuario
+    function showConfirm(message) {
+      return new Promise((resolve) => {
+        const toast = document.createElement('div');
+        toast.className = 'toast confirm';
+        toast.setAttribute('role', 'alertdialog');
+        toast.setAttribute('aria-modal', 'true');
+
+        const msgSpan = document.createElement('div');
+        msgSpan.textContent = message;
+        toast.appendChild(msgSpan);
+
+        const btnsDiv = document.createElement('div');
+        btnsDiv.className = 'toast confirm-buttons';
+
+        const yesBtn = document.createElement('button');
+        yesBtn.textContent = 'Sí';
+        yesBtn.className = 'yes';
+        yesBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          resolve(true);
+        };
+
+        const noBtn = document.createElement('button');
+        noBtn.textContent = 'No';
+        noBtn.className = 'no';
+        noBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          resolve(false);
+        };
+
+        btnsDiv.appendChild(noBtn);
+        btnsDiv.appendChild(yesBtn);
+        toast.appendChild(btnsDiv);
+
+        toastContainer.appendChild(toast);
+      });
+    }
+
+    function renderUsers() {
+      usersTableBody.innerHTML = '';
+      filteredUsers.forEach(user => {
+        const isAdmin = user.role.toLowerCase() === 'administrador';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${user.id}</td>
+          <td>${user.name}</td>
+          <td>${user.role}</td>
+          <td>
+            ${isAdmin ? '' : `<button data-id="${user.id}" class="editBtn" aria-label="Editar usuario ${user.name}">Editar</button>
+            <button data-id="${user.id}" data-role="${user.role}" class="deleteBtn" aria-label="Eliminar usuario ${user.name}">Eliminar</button>`}
+          </td>
+        `;
+        usersTableBody.appendChild(tr);
+      });
+
+      if (!users.some(u => u.role.toLowerCase() === 'administrador')) {
+        // No admin users? nothing to disable
+      } else {
+        // Solo agregar eventos a los botones que existen
+        document.querySelectorAll('.editBtn').forEach(btn => {
+          btn.onclick = () => {
+            const id = btn.getAttribute('data-id');
+            const user = users.find(u => u.id == id);
+            if (!user) return showToast('Usuario no encontrado', 'error');
+
+            formTitle.textContent = 'Editar Usuario';
+            userForm.userId.value = user.id;
+            userForm.userName.value = user.name;
+            userForm.userRole.value = user.role;
+            userForm.userPassword.value = '';
+            showForm();
+            userForm.userName.focus();
+          };
+        });
+
+        document.querySelectorAll('.deleteBtn').forEach(btn => {
+          btn.onclick = async () => {
+            const userId = btn.getAttribute('data-id');
+            const userRole = btn.getAttribute('data-role');
+
+            if (userRole.toLowerCase() === 'administrador') {
+              showToast('No se puede eliminar un administrador.', 'error');
+              return;
+            }
+
+            const confirmed = await showConfirm('¿Está seguro de que desea eliminar este usuario?');
+            if (!confirmed) return;
+
+            try {
+              const res = await fetch(apiUrl + '?action=delete&id=' + userId, { method: 'POST' });
+              const data = await res.json();
+              if (data.status === 'ok') {
+                showToast('Usuario eliminado.', 'success');
+                loadUsers();
+              } else {
+                showToast('Error al eliminar usuario: ' + data.message, 'error');
+              }
+            } catch (err) {
+              showToast('Error de red al eliminar usuario.', 'error');
+            }
+          };
+        });
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch(apiUrl + '?action=list');
+        const data = await res.json();
+        if (data.status === 'ok') {
+          users = data.users;
+          filteredUsers = users;
+          renderUsers();
+        } else {
+          showToast('Error al cargar usuarios: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Error de red al cargar usuarios.', 'error');
+      }
+    }
+
+    filterInput.addEventListener('input', () => {
+      const term = filterInput.value.toLowerCase();
+      filteredUsers = users.filter(u => 
+        u.name.toLowerCase().includes(term) || 
+        u.role.toLowerCase().includes(term)
+      );
+      renderUsers();
+    });
+
+    addUserBtn.addEventListener('click', () => {
+      formTitle.textContent = 'Crear Usuario';
+      userForm.userId.value = '';
+      userForm.userName.value = '';
+      userForm.userRole.value = '';
+      userForm.userPassword.value = '';
+      showForm();
+      userForm.userName.focus();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      hideForm();
+    });
+
+    function showForm() {
+      userFormContainer.classList.add('active');
+      userFormContainer.setAttribute('aria-hidden', 'false');
+      mainContent.classList.add('shifted');
+    }
+
+    function hideForm() {
+      userFormContainer.classList.remove('active');
+      userFormContainer.setAttribute('aria-hidden', 'true');
+      mainContent.classList.remove('shifted');
+    }
+
+    userForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(userForm);
+      const id = formData.get('id');
+      const name = formData.get('name').trim();
+      const role = formData.get('role');
+      const password = formData.get('password');
+
+      if (!name) {
+        showToast('El nombre es obligatorio', 'warning');
+        return;
+      }
+      if (!role) {
+        showToast('Debe seleccionar un rol', 'warning');
+        return;
+      }
+
+      if (role.toLowerCase() === 'administrador') {
+        showToast('No está permitido asignar el rol Administrador', 'error');
+        return;
+      }
+
+      const action = id ? 'update' : 'create';
+
+      const payload = { name, role };
+      if (id) payload.id = id;
+      if (password.trim() !== '') {
+        payload.password = password;
+      }
+
+      const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      };
+
+      try {
+        const res = await fetch(apiUrl + '?action=' + action, options);
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          showToast(data.message, 'success');
+          hideForm();
+          loadUsers();
+        } else {
+          showToast('Error: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Error de red al guardar usuario.', 'error');
+      }
+    });
+
+    dashboardBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.php';
+    });
+
+    loadUsers();
+  </script>
+</body>
+</html>

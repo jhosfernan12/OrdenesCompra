@@ -196,19 +196,41 @@ a:hover {
 
 /* Sidebar */
 .sidebar {
-    width: 220px;
-    background-color: #007c91;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+    width: 250px;
     height: 100vh;
+    background-color: #263238;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .sidebar h2 {
-    font-size: 1.5em;
     margin-bottom: 30px;
+    font-size: 24px;
+    color: #ffffff;
 }
+
+.sidebar-nav a {
+    display: block;
+    color: #ffffff; /* CAMBIADO a blanco */
+    text-decoration: none;
+    margin: 15px 0;
+    padding: 12px 18px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 1.3em; /* MÁS GRANDE */
+    font-weight: 500; /* Más peso visual */
+}
+
+
+.sidebar-nav a:hover {
+    background-color: rgba(30, 167, 185, 0.582); /* fondo sutil al pasar el mouse */
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateX(5px);
+}
+
 
 .sidebar a {
     color: white;
@@ -222,7 +244,8 @@ a:hover {
 
 .sidebar a:hover {
     background-color: #33c9dc; /* azul celeste más claro */
-    color: #003840; /* un tono más oscuro para contraste */
+    color: #ffffff; /* un tono más oscuro para contraste */
+    font-size: 1.15em;
 }
 
 /* Main content area */
@@ -263,7 +286,7 @@ a:hover {
 }
 
 .top-bar .menu-item a:hover {
-    background-color: #00ccff3f;
+    background-color: #a3a3a3;
     padding: 6px 12px;
     border-radius: 8px;
 }
@@ -324,3 +347,4 @@ a:hover {
     animation: fadeInUp 0.6s ease-out;
     transition: opacity 0.3s ease;
 }
+
