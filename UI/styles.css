@@ -8,6 +8,7 @@
 
 /* Estilos del cuerpo */
 body {
+    
     background-color: #e9f8fa;
     display: flex;
     justify-content: center;
@@ -24,7 +25,7 @@ body {
     max-width: 400px;
     padding: 25px;
     background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    border-radius: 50px;
     box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.2);
     text-align: center;
     transition: all 0.3s ease;
@@ -56,7 +57,7 @@ body {
 h2 {
     font-size: 1.9em;
     margin-bottom: 20px;
-    color: #007c91; /* Celeste profundo */
+    color: #98AEFF; /* Celeste profundo */
 }
 
 /* Estilos del formulario */
@@ -69,7 +70,7 @@ form {
 /* Labels */
 label {
     font-size: 1em;
-    color: #0097a7; /* Turquesa claro */
+    color: #98AEFF; /* Turquesa claro */
     margin-bottom: 5px;
     text-align: left;
 }
@@ -79,28 +80,30 @@ input[type="text"], input[type="password"], input[type="email"] {
     padding: 12px;
     font-size: 1em;
     border: 1px solid #b2ebf2;
-    border-radius: 12px;
+    border-radius: 20px;  /* Redondear los bordes */
     background-color: #f6feff;
     outline: none;
     transition: all 0.3s ease;
-    margin-bottom: 10px; /* Se agrega margen abajo para separar los campos */
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra ligera */
 }
 
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
     border-color: #00bcd4;
-    box-shadow: #000000;
+    box-shadow: 0 0 8px rgba(0, 188, 212, 0.4);  /* Sombra al enfocar */
     background-color: #ffffff;
 }
+
 
 /* Botones */
 input[type="submit"] {
     padding: 12px;
-    background-color: #00acc1;
+    background-color: #98AEFF;
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 1.1em;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -109,7 +112,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #0097a7;
+    background-color: #839cf8;
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
     transform: scale(1.02);
 }
@@ -143,7 +146,7 @@ p {
 }
 
 a {
-    color: #00acc1;
+    color: #2898a7;
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -305,14 +308,17 @@ a:hover {
     background-color: #00acc1;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;  /* Redondear más los bordes */
     cursor: pointer;
     transition: background-color 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Sombra ligera */
 }
 
 .dashboard-buttons button:hover {
-    background-color: #0097a7;
+    background-color: #47a0bb;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);  /* Sombra más fuerte al hacer hover */
 }
+
 
 /* Footer */
 .footer {
@@ -346,5 +352,13 @@ a:hover {
     margin-bottom: 15px;
     animation: fadeInUp 0.6s ease-out;
     transition: opacity 0.3s ease;
+}
+
+* {
+    font-family: 'Inter', sans-serif; /* Asegúrate de tener la fuente Inter en tu HTML */
+}
+
+body, input, button {
+    font-weight: 550;  /* Semibold */
 }
 

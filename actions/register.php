@@ -8,9 +8,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $correo = $_POST['correo'];
         $rol = 'Administrador';
 
+        // Verificar si ya existe un administrador
+        $sql_check_admin = "SELECT * FROM Usuarios WHERE Rol = 'Administrador'";
+        $result_check_admin = $conn->query($sql_check_admin);
+
+        if ($result_check_admin->num_rows > 0) {
+            // Si ya existe un administrador, impedir crear otro
+            header("Location: ../screens/register.html?mensaje=Ya%20existe%20un%20administrador.%20No%20puedes%20registrar%20a%20otro%20administrador.&tipo=error");
+            exit();
+        }
+
         // Verificar si el usuario ya existe
-        $sql_check = "SELECT * FROM Usuarios WHERE Nombre = ?";
-        $stmt_check = $conn->prepare($sql_check);
+        $sql_check_user = "SELECT * FROM Usuarios WHERE Nombre = ?";
+        $stmt_check = $conn->prepare($sql_check_user);
         $stmt_check->bind_param("s", $usuario);
         $stmt_check->execute();
         $result_check = $stmt_check->get_result();
@@ -36,5 +46,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 }
-
 ?>

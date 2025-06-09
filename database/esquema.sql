@@ -34,11 +34,21 @@ CREATE TABLE IF NOT EXISTS Productos (
     FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor)
 );
 
+CREATE TABLE IF NOT EXISTS Inventario (
+    IDInventario INT AUTO_INCREMENT PRIMARY KEY,
+    IDProducto INT NOT NULL,
+    StockActual INT NOT NULL,        
+    StockMinimo INT NOT NULL,        
+    FechaUltimaActualizacion DATE NOT NULL,
+    FOREIGN KEY (IDProducto) REFERENCES Productos(IDProducto)
+);
+
+
 -- Tabla de OrdenesCompra
 CREATE TABLE IF NOT EXISTS OrdenesCompra (
     IDOrden INT AUTO_INCREMENT PRIMARY KEY,
     FechaOrden DATE NOT NULL,
-    Estado VARCHAR(50) NOT NULL,
+    Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
     IDProveedor INT,
     IDUsuario INT,
     FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor),

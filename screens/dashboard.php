@@ -27,13 +27,13 @@ if (!isset($_SESSION['usuario'])) {
             background-color: #f0f8f3;
         }
         .sidebar {
-            background-color: rgba(61, 138, 161, 0.89);
+            background-color:rgb(129, 156, 253);
             color: #fff;
             width: 250px;
             padding: 20px;
             position: fixed;
             height: 100%;
-            box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 1px 0px 25px rgb(0, 0, 0);
         }
         .sidebar h2 {
             font-size: 1.5em;
@@ -51,7 +51,7 @@ if (!isset($_SESSION['usuario'])) {
             transition: background-color 0.3s ease;
         }
         .sidebar a:hover {
-            background-color: rgba(26, 38, 52, 0.8);
+            background-color:hsla(194, 44.90%, 34.90%, 0.48);
         }
         .main-content {
             margin-left: 250px;
@@ -88,10 +88,10 @@ if (!isset($_SESSION['usuario'])) {
         .dashboard-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 25px;
         }
         .dashboard-buttons button {
-            background-color: #4ccbd4;
+            background-color: #98AEFF;
             color: white;
             border: none;
             padding: 15px;
@@ -99,10 +99,12 @@ if (!isset($_SESSION['usuario'])) {
             font-size: 1.2em;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7);
         }
         .dashboard-buttons button:hover {
-            background-color: rgba(76, 203, 212, 0.84);
+            background-color:rgb(123, 151, 253);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7);
+            font-size: 1.3em;
         }
         .footer {
             background-color: rgba(45, 54, 62, 0.1);
@@ -136,8 +138,8 @@ if (!isset($_SESSION['usuario'])) {
                 <a href="#"><i class="fas fa-truck"></i> Gestión Proveedores</a>
                 <a href="#"><i class="fas fa-box"></i> Gestión Productos</a>
                 <a href="#"><i class="fas fa-shopping-cart"></i> Órdenes de Compra</a>
-                <a href="#"><i class="fas fa-chart-line"></i> Reportes</a>
-                <a href="#"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Inventario</a>
+                <a href="usermanagement.html"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
             </nav>
         </div>
 
@@ -153,7 +155,7 @@ if (!isset($_SESSION['usuario'])) {
                 <button>Gestión Proveedores</button>
                 <button>Gestión Productos</button>
                 <button>Órdenes de Compra</button>
-                <button>Reportes</button>
+                <button>Inventario</button>
                 <button id="btnUserManagement">Gestión Usuarios</button>
             </div>
 

@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Gestión de Usuarios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     /* Contenedor principal que contiene todo */
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
-    }
+    body, html, input, button, select {
+    font-family: 'Poppins', sans-serif;
+    background-color: #e7e7e7;
+    font-weight: 550;  /* Semibold */
+  }
     #app {
       display: flex;
       max-width: 900px;
@@ -38,23 +39,24 @@
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     button, input[type="submit"] {
-      background-color: #00acc1;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-      margin-top: 15px;
-    }
-    button:hover, input[type="submit"]:hover {
-      background-color: #3d8aa1;
-    }
+    background-color: #98AEFF;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 30px; /* Redondeado */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.377); /* Sombra ligera */
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover, input[type="submit"]:hover {
+    background-color: #47a0bb;
+  }
 
     #dashboardBtn {
       margin-bottom: 15px;
@@ -84,34 +86,47 @@
       border-collapse: collapse;
       margin-top: 10px;
       font-size: 0.9rem;
+      border-radius: 10px; /* Bordes redondeados */
+      overflow: hidden; /* Asegura que los bordes redondeados no se corten */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+      background-color: #fff; /* Fondo blanco */
     }
     thead {
-      background-color: #3d8aa1;
+      background-color: #98AEFF;
       color: white;
     }
     th, td {
       padding: 10px 8px;
       border: 1px solid #ddd;
       text-align: left;
+      border-radius: 6px;
+      white-space: nowrap; /* Evita saltos de línea en celdas */
+      vertical-align: middle;
     }
+
+
     tbody tr:nth-child(even) {
       background-color: #f9f9f9;
     }
 
     .editBtn, .deleteBtn {
-      background-color: #28a745;
+      display: inline-block; /* fuerza a estar en línea */
+      background-color: #98AEFF;
       margin-right: 5px;
       padding: 6px 10px;
       font-size: 0.85rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      white-space: nowrap; /* evita que se parta el texto */
+      vertical-align: middle;
     }
+
     .deleteBtn {
       background-color: #dc3545;
     }
     .editBtn:hover {
-      background-color: #1e7e34;
+      background-color: #cf9f57;
     }
     .deleteBtn:hover {
       background-color: #bd2130;
@@ -159,6 +174,10 @@
       gap: 10px;
       max-width: 320px;
     }
+    #addUserBtn {
+    margin-top: 20px; /* Espacio de 20px arriba del botón */
+  }
+
 
     /* Estilo general toast */
     .toast {
@@ -209,7 +228,7 @@
       transition: background-color 0.2s ease;
     }
     .toast button:hover {
-      background-color: rgba(255 255 255 / 0.3);
+      background-color: #ffffff4d;
     }
 
     /* Estilos confirmación en toast */
@@ -248,7 +267,8 @@
     <div id="mainContent">
       <h1>Gestión de Usuarios</h1>
 
-      <button id="dashboardBtn">Volver al Dashboard</button>
+      <button id="dashboardBtn" role="button" aria-label="Volver al dashboard">Volver al Dashboard</button>
+
 
       <div>
         <input type="text" id="filterInput" placeholder="Filtrar por nombre o rol" />
@@ -272,31 +292,37 @@
     </div>
 
     <div id="userFormContainer" aria-hidden="true">
-      <h3 id="formTitle">Crear Usuario</h3>
+      <h3 id="formTitle">Añadir Usuario</h3>
       <form id="userForm" autocomplete="off" novalidate>
         <input type="hidden" id="userId" name="id" />
         <label for="userName">
           Nombre:<br />
-          <input type="text" id="userName" name="name" required autocomplete="off" />
+          <input type="text" id="userName" name="name"  maxlength="55" required autocomplete="off" />
         </label>
         <label for="userRole">
           Rol:<br />
-          <select id="userRole" name="role" required>
+          <select id="userRole" name="role"  required>
             <option value="">-- Seleccione rol --</option>
             <option value="Comprador">Comprador</option>
             <option value="Supervisor">Supervisor</option>
           </select>
         </label>
         <label for="userPassword">
-          Contraseña:<br />
+        Contraseña:<br />
+        <div style="position: relative;">
           <input type="password" id="userPassword" name="password" placeholder="" autocomplete="new-password" />
-        </label>
+          <img id="togglePassword" src="../UI/assets/eyeclosed.png" alt="Mostrar/Ocultar contraseña" 
+              style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; cursor: pointer;">
+        </div>
+      </label>
         <button type="submit" id="saveBtn">Guardar</button>
         <button type="button" id="cancelBtn">Cancelar</button>
       </form>
     </div>
   </div>
 
+
+  
   <!-- Contenedor para toasts -->
   <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
@@ -559,5 +585,23 @@
 
     loadUsers();
   </script>
+
+
+  <script>
+  // Mostrar/Ocultar contraseña con el ícono
+  document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('userPassword');
+    const toggleIcon = document.getElementById('togglePassword');
+    let isVisible = false;
+
+    toggleIcon.addEventListener('click', () => {
+      isVisible = !isVisible;
+      passwordInput.type = isVisible ? 'text' : 'password';
+      toggleIcon.src = isVisible ? '../UI/assets/eyeallowed.png' : '../UI/assets/eyeclosed.png';
+    });
+  });
+</script>
+
+
 </body>
 </html>
