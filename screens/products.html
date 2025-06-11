@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Gestión de Usuarios</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Gestión de Productos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     /* Contenedor principal que contiene todo */
     body, html, input, button, select {
-    font-family: 'Poppins', sans-serif;
-    background-color: #e7e7e7;
-    font-weight: 550;  /* Semibold */
-  }
+      font-family: 'Poppins', sans-serif;
+      background-color: #e7e7e7;
+      font-weight: 550;  /* Semibold */
+    }
+    
     #app {
       display: flex;
       max-width: 900px;
@@ -36,27 +36,27 @@
       flex: 0 0 520px; /* se reduce para dar espacio al formulario */
     }
 
-    h1 {
+    h1, h2, h3 {
       text-align: center;
       margin-bottom: 20px;
       font-weight: 500;
     }
 
     button, input[type="submit"] {
-    background-color: #98AEFF;
-    color: rgb(255, 255, 255);
-    border: none;
-    padding: 10px 15px;
-    border-radius: 30px; /* Redondeado */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.377); /* Sombra ligera */
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-  }
+      background-color: #98AEFF;
+      color: rgb(255, 255, 255);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 30px; /* Redondeado */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.377); /* Sombra ligera */
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
 
-  button:hover, input[type="submit"]:hover {
-    background-color: #7a96f5;
-  }
+    button:hover, input[type="submit"]:hover {
+      background-color: #7a96f5;
+    }
 
     #dashboardBtn {
       margin-bottom: 15px;
@@ -64,6 +64,7 @@
     }
 
     input[type="text"],
+    input[type="number"],
     input[type="password"],
     select {
       width: 100%;
@@ -91,10 +92,12 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
       background-color: #fff; /* Fondo blanco */
     }
+    
     thead {
       background-color: #98AEFF;
       color: white;
     }
+    
     th, td {
       padding: 10px 8px;
       border: 1px solid #ddd;
@@ -103,7 +106,6 @@
       white-space: nowrap; /* Evita saltos de línea en celdas */
       vertical-align: middle;
     }
-
 
     tbody tr:nth-child(even) {
       background-color: #f9f9f9;
@@ -125,15 +127,18 @@
     .deleteBtn {
       background-color: #dc3545;
     }
+    
     .editBtn:hover {
       background-color: #7a96f5;
     }
+    
     .deleteBtn:hover {
       background-color: #bd2130;
     }
 
+    
     /* Formulario - inicialmente oculto con ancho 0 */
-    #userFormContainer {
+    #formSection {
       flex: 0 0 0;
       padding: 25px 20px;
       box-sizing: border-box;
@@ -145,13 +150,13 @@
       pointer-events: none;
     }
 
-    #userFormContainer.active {
+    #formSection.active {
       flex: 0 0 380px;
       opacity: 1;
       pointer-events: auto;
     }
 
-    #userFormContainer h3 {
+    #formSection h3 {
       margin-top: 0;
     }
 
@@ -159,6 +164,7 @@
       background-color: #dc3545;
       margin-left: 10px;
     }
+    
     #cancelBtn:hover {
       background-color: #b71c1c;
     }
@@ -174,10 +180,10 @@
       gap: 10px;
       max-width: 320px;
     }
-    #addUserBtn {
-    margin-top: 20px; /* Espacio de 20px arriba del botón */
-  }
-
+    
+    #addProductBtn {
+      margin-top: 20px; /* Espacio de 20px arriba del botón */
+    }
 
     /* Estilo general toast */
     .toast {
@@ -205,12 +211,15 @@
     .toast.success {
       background-color: #28a745;
     }
+    
     .toast.error {
       background-color: #dc3545;
     }
+    
     .toast.info {
       background-color: #007bff;
     }
+    
     .toast.warning {
       background-color: #ffc107;
       color: #333;
@@ -227,6 +236,7 @@
       border-radius: 4px;
       transition: background-color 0.2s ease;
     }
+    
     .toast button:hover {
       background-color: #ffffff4d;
     }
@@ -241,6 +251,7 @@
       font-size: 1rem;
       color: #fff;
     }
+    
     .toast.confirm-buttons {
       align-self: stretch;
       display: flex;
@@ -248,101 +259,118 @@
       gap: 10px;
       width: 100%;
     }
+    
     .toast.confirm button {
       background-color: rgba(255,255,255,0.2);
       color: white;
       font-weight: 600;
       padding: 8px 14px;
     }
+    
     .toast.confirm button.yes:hover {
       background-color: #28a745;
     }
+    
     .toast.confirm button.no:hover {
       background-color: #dc3545;
+    }
+    
+    .price-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .price-container input {
+      flex: 1;
+      margin-right: 10px;
+    }
+    
+    .price-container select {
+      width: auto;
+      min-width: 80px;
     }
   </style>
 </head>
 <body>
   <div id="app">
     <div id="mainContent">
-      <h1>Gestión de Usuarios</h1>
+      <h1>Gestión de Productos</h1>
 
       <button id="dashboardBtn" role="button" aria-label="Volver al dashboard">Volver al Dashboard</button>
 
-
       <div>
-        <input type="text" id="filterInput" placeholder="Filtrar por nombre o rol" />
+        <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
       </div>
 
-      <table id="usersTable" aria-label="Lista de usuarios">
+      <table id="productTable" aria-label="Lista de productos">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
-            <th>Rol</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Proveedor</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Usuarios listados aquí -->
+          <!-- Productos listados aquí -->
         </tbody>
       </table>
 
-      <button id="addUserBtn">Agregar Usuario</button>
+      <button id="addProductBtn">Agregar Producto</button>
     </div>
 
-    <div id="userFormContainer" aria-hidden="true">
-      <h3 id="formTitle">Añadir Usuario</h3>
-      <form id="userForm" autocomplete="off" novalidate>
-        <input type="hidden" id="userId" name="id" />
-        <label for="userName">
+    <div id="formSection" aria-hidden="true">
+      <h3 id="formTitle">Añadir Producto</h3>
+      <form id="productForm" autocomplete="off" novalidate>
+        <input type="hidden" id="productId" name="id" />
+        <label for="name">
           Nombre:<br />
-          <input type="text" id="userName" name="name"  maxlength="41" required autocomplete="off" />
+          <input type="text" id="name" name="name" required autocomplete="off" />
         </label>
-        <label for="userRole">
-          Rol:<br />
-          <select id="userRole" name="role"  required>
-            <option value="">-- Seleccione rol --</option>
-            <option value="Comprador">Comprador</option>
-            <option value="Supervisor">Supervisor</option>
-          </select>
+        <label for="description">
+          Descripción:<br />
+          <input type="text" id="description" name="description" required />
         </label>
-        <label for="userPassword">
-        Contraseña:<br />
-        <div style="position: relative;">
-          <input type="password" id="userPassword" name="password" placeholder="" autocomplete="new-password" />
-          <img id="togglePassword" src="../UI/assets/eyeclosed.png" alt="Mostrar/Ocultar contraseña" 
-              style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; cursor: pointer;">
-        </div>
-      </label>
+        <label for="price">
+          Precio:<br />
+          <div class="price-container">
+            <input type="number" step="0.01" id="price" name="price" required />
+            <select id="currency" name="currency">
+              <option value="USD">$ USD</option>
+              <option value="PEN">S/ PEN</option>
+            </select>
+          </div>
+        </label>
+        <label for="providerSelect">
+          Proveedor:<br />
+          <select id="providerSelect" name="provider_id" required></select>
+        </label>
         <button type="submit" id="saveBtn">Guardar</button>
         <button type="button" id="cancelBtn">Cancelar</button>
       </form>
     </div>
   </div>
 
-
-  
   <!-- Contenedor para toasts -->
   <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <script>
-    const apiUrl = '../actions/usermanagement.php';
+    let providers = [];
+    let products = [];
 
-    let users = [];
-    let filteredUsers = [];
-
-    const usersTableBody = document.querySelector('#usersTable tbody');
-    const filterInput = document.getElementById('filterInput');
-    const userFormContainer = document.getElementById('userFormContainer');
-    const userForm = document.getElementById('userForm');
+    // Elementos del DOM
+    const productTableBody = document.querySelector('#productTable tbody');
+    const searchInput = document.getElementById('searchInput');
+    const formSection = document.getElementById('formSection');
+    const productForm = document.getElementById('productForm');
     const formTitle = document.getElementById('formTitle');
-    const addUserBtn = document.getElementById('addUserBtn');
+    const addProductBtn = document.getElementById('addProductBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const dashboardBtn = document.getElementById('dashboardBtn');
     const mainContent = document.getElementById('mainContent');
-
     const toastContainer = document.getElementById('toastContainer');
+    const providerSelect = document.getElementById('providerSelect');
 
     // Función para crear toasts
     function showToast(message, type = 'info', duration = 4000) {
@@ -368,7 +396,6 @@
     }
 
     // Función para mostrar confirmación personalizada
-    // Retorna Promise que se resuelve true o false según respuesta del usuario
     function showConfirm(message) {
       return new Promise((resolve) => {
         const toast = document.createElement('div');
@@ -407,201 +434,206 @@
       });
     }
 
-    function renderUsers() {
-      usersTableBody.innerHTML = '';
-      filteredUsers.forEach(user => {
-        const isAdmin = user.role.toLowerCase() === 'administrador';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${user.id}</td>
-          <td>${user.name}</td>
-          <td>${user.role}</td>
-          <td>
-            ${isAdmin ? '' : `<button data-id="${user.id}" class="editBtn" aria-label="Editar usuario ${user.name}">Editar</button>
-            <button data-id="${user.id}" data-role="${user.role}" class="deleteBtn" aria-label="Eliminar usuario ${user.name}">Eliminar</button>`}
-          </td>
-        `;
-        usersTableBody.appendChild(tr);
-      });
-
-      if (!users.some(u => u.role.toLowerCase() === 'administrador')) {
-        // No admin users? nothing to disable
-      } else {
-        // Solo agregar eventos a los botones que existen
-        document.querySelectorAll('.editBtn').forEach(btn => {
-          btn.onclick = () => {
-            const id = btn.getAttribute('data-id');
-            const user = users.find(u => u.id == id);
-            if (!user) return showToast('Usuario no encontrado', 'error');
-
-            formTitle.textContent = 'Editar Usuario';
-            userForm.userId.value = user.id;
-            userForm.userName.value = user.name;
-            userForm.userRole.value = user.role;
-            userForm.userPassword.value = '';
-            showForm();
-            userForm.userName.focus();
-          };
-        });
-
-        document.querySelectorAll('.deleteBtn').forEach(btn => {
-          btn.onclick = async () => {
-            const userId = btn.getAttribute('data-id');
-            const userRole = btn.getAttribute('data-role');
-
-            if (userRole.toLowerCase() === 'administrador') {
-              showToast('No se puede eliminar un administrador.', 'error');
-              return;
-            }
-
-            const confirmed = await showConfirm('¿Está seguro de que desea eliminar este usuario?');
-            if (!confirmed) return;
-
-            try {
-              const res = await fetch(apiUrl + '?action=delete&id=' + userId, { method: 'POST' });
-              const data = await res.json();
-              if (data.status === 'ok') {
-                showToast('Usuario eliminado.', 'success');
-                loadUsers();
-              } else {
-                showToast('Error al eliminar usuario: ' + data.message, 'error');
-              }
-            } catch (err) {
-              showToast('Error de red al eliminar usuario.', 'error');
-            }
-          };
-        });
-      }
-    }
-
-    async function loadUsers() {
+    async function loadProviders() {
       try {
-        const res = await fetch(apiUrl + '?action=list');
+        const res = await fetch('../actions/products.php?action=providers');
         const data = await res.json();
         if (data.status === 'ok') {
-          users = data.users;
-          filteredUsers = users;
-          renderUsers();
+          providers = data.providers;
+          providerSelect.innerHTML = '';
+          
+          // Opción por defecto
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = '-- Seleccione proveedor --';
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          providerSelect.appendChild(defaultOption);
+          
+          data.providers.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name;
+            providerSelect.appendChild(opt);
+          });
         } else {
-          showToast('Error al cargar usuarios: ' + data.message, 'error');
+          showToast('Error al cargar proveedores: ' + data.message, 'error');
         }
       } catch (err) {
-        showToast('Error de red al cargar usuarios.', 'error');
+        showToast('Error de red al cargar proveedores', 'error');
       }
     }
 
-    filterInput.addEventListener('input', () => {
-      const term = filterInput.value.toLowerCase();
-      filteredUsers = users.filter(u => 
-        u.name.toLowerCase().includes(term) || 
-        u.role.toLowerCase().includes(term)
-      );
-      renderUsers();
-    });
+    async function loadProducts() {
+      try {
+        const res = await fetch('../actions/products.php?action=list');
+        const data = await res.json();
+        if (data.status === 'ok') {
+          products = data.products;
+          renderProducts();
+        } else {
+          showToast('Error al cargar productos: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Error de red al cargar productos', 'error');
+      }
+    }
 
-    addUserBtn.addEventListener('click', () => {
-      formTitle.textContent = 'Añadir Usuario';
-      userForm.userId.value = '';
-      userForm.userName.value = '';
-      userForm.userRole.value = '';
-      userForm.userPassword.value = '';
-      showForm();
-      userForm.userName.focus();
-    });
+    function renderProducts() {
+      productTableBody.innerHTML = '';
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      const filteredProducts = searchTerm 
+        ? products.filter(p => p.name.toLowerCase().includes(searchTerm))
+        : products;
 
-    cancelBtn.addEventListener('click', () => {
-      hideForm();
-    });
+      filteredProducts.forEach(product => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${product.name}</td>
+          <td>${product.description}</td>
+          <td>${product.currency === 'PEN' ? 'S/' : '$'}${parseFloat(product.price).toFixed(2)}</td>
+          <td>${product.provider_name}</td>
+          <td>
+            <button data-id="${product.id}" class="editBtn" aria-label="Editar producto ${product.name}">Editar</button>
+            <button data-id="${product.id}" class="deleteBtn" aria-label="Eliminar producto ${product.name}">Eliminar</button>
+          </td>
+        `;
+        productTableBody.appendChild(tr);
+      });
+
+      // Agregar eventos a los botones de editar y eliminar
+      document.querySelectorAll('.editBtn').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.getAttribute('data-id');
+          const product = products.find(p => p.id == id);
+          if (!product) return showToast('Producto no encontrado', 'error');
+
+          formTitle.textContent = 'Editar Producto';
+          productForm.productId.value = product.id;
+          productForm.name.value = product.name;
+          productForm.description.value = product.description;
+          productForm.price.value = product.price;
+          productForm.currency.value = product.currency || 'USD';
+          productForm.providerSelect.value = product.provider_id;
+          showForm();
+          productForm.name.focus();
+        };
+      });
+
+      document.querySelectorAll('.deleteBtn').forEach(btn => {
+        btn.onclick = async () => {
+          const productId = btn.getAttribute('data-id');
+          const confirmed = await showConfirm('¿Está seguro de que desea eliminar este producto?');
+          if (!confirmed) return;
+
+          try {
+            const res = await fetch(`../actions/products.php?action=delete&id=${productId}`);
+            const result = await res.json();
+            if (result.status === 'ok') {
+              showToast('Producto eliminado.', 'success');
+              loadProducts();
+            } else {
+              showToast('Error al eliminar producto: ' + result.message, 'error');
+            }
+          } catch (err) {
+            showToast('Error de red al eliminar producto.', 'error');
+          }
+        };
+      });
+    }
 
     function showForm() {
-      userFormContainer.classList.add('active');
-      userFormContainer.setAttribute('aria-hidden', 'false');
+      formSection.classList.add('active');
+      formSection.setAttribute('aria-hidden', 'false');
       mainContent.classList.add('shifted');
     }
 
     function hideForm() {
-      userFormContainer.classList.remove('active');
-      userFormContainer.setAttribute('aria-hidden', 'true');
+      formSection.classList.remove('active');
+      formSection.setAttribute('aria-hidden', 'true');
       mainContent.classList.remove('shifted');
     }
 
-    userForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Event Listeners
+    searchInput.addEventListener('input', renderProducts);
 
-      const formData = new FormData(userForm);
-      const id = formData.get('id');
-      const name = formData.get('name').trim();
-      const role = formData.get('role');
-      const password = formData.get('password');
-
-      if (!name) {
-        showToast('El nombre es obligatorio', 'warning');
-        return;
-      }
-      if (!role) {
-        showToast('Debe seleccionar un rol', 'warning');
-        return;
-      }
-
-      if (role.toLowerCase() === 'administrador') {
-        showToast('No está permitido asignar el rol Administrador', 'error');
-        return;
-      }
-
-      const action = id ? 'update' : 'create';
-
-      const payload = { name, role };
-      if (id) payload.id = id;
-      if (password.trim() !== '') {
-        payload.password = password;
-      }
-
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      };
-
-      try {
-        const res = await fetch(apiUrl + '?action=' + action, options);
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-          showToast(data.message, 'success');
-          hideForm();
-          loadUsers();
-        } else {
-          showToast('Error: ' + data.message, 'error');
-        }
-      } catch (err) {
-        showToast('Error de red al guardar usuario.', 'error');
-      }
+    addProductBtn.addEventListener('click', () => {
+      formTitle.textContent = 'Añadir Producto';
+      productForm.reset();
+      productForm.productId.value = '';
+      showForm();
+      productForm.name.focus();
     });
+
+    cancelBtn.addEventListener('click', hideForm);
 
     dashboardBtn.addEventListener('click', () => {
       window.location.href = 'dashboard.php';
     });
 
-    loadUsers();
-  </script>
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
+      const formData = new FormData(productForm);
+      const id = formData.get('id');
+      const name = formData.get('name').trim();
+      const description = formData.get('description').trim();
+      const price = formData.get('price');
+      const currency = formData.get('currency');
+      const provider_id = formData.get('provider_id');
 
-  <script>
-  // Mostrar/Ocultar contraseña con el ícono
-  document.addEventListener('DOMContentLoaded', () => {
-    const passwordInput = document.getElementById('userPassword');
-    const toggleIcon = document.getElementById('togglePassword');
-    let isVisible = false;
+      // Validaciones
+      if (!name) {
+        showToast('El nombre es obligatorio', 'warning');
+        return;
+      }
+      if (!description) {
+        showToast('La descripción es obligatoria', 'warning');
+        return;
+      }
+      if (!price || parseFloat(price) <= 0) {
+        showToast('El precio debe ser mayor a 0', 'warning');
+        return;
+      }
+      if (!provider_id) {
+        showToast('Debe seleccionar un proveedor', 'warning');
+        return;
+      }
 
-    toggleIcon.addEventListener('click', () => {
-      isVisible = !isVisible;
-      passwordInput.type = isVisible ? 'text' : 'password';
-      toggleIcon.src = isVisible ? '../UI/assets/eyeallowed.png' : '../UI/assets/eyeclosed.png';
+      const action = id ? 'update' : 'create';
+      const payload = { 
+        name, 
+        description, 
+        price, 
+        currency, 
+        provider_id 
+      };
+      
+      if (id) payload.id = id;
+
+      try {
+        const res = await fetch(`../actions/products.php?action=${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.status === 'ok') {
+          showToast(data.message, 'success');
+          hideForm();
+          loadProducts();
+        } else {
+          showToast('Error: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Error de red al guardar producto', 'error');
+      }
     });
-  });
-</script>
 
-
+    // Inicialización
+    loadProviders().then(loadProducts);
+  </script>
 </body>
 </html>

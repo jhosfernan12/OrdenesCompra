@@ -135,11 +135,11 @@ if (!isset($_SESSION['usuario'])) {
         <div class="sidebar">
             <h2>Panel de Control</h2>
             <nav class="sidebar-nav">
-                <a href="#"><i class="fas fa-truck"></i> Gestión Proveedores</a>
-                <a href="#"><i class="fas fa-box"></i> Gestión Productos</a>
+                <a href="#" id="linkSuppliers"><i class="fas fa-truck"></i> Gestión Proveedores</a>
+                <a href="#" id="linkProducts"><i class="fas fa-box"></i> Gestión Productos</a>
                 <a href="#"><i class="fas fa-shopping-cart"></i> Órdenes de Compra</a>
-                <a href="#"><i class="fas fa-chart-line"></i> Inventario</a>
-                <a href="usermanagement.html"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
+                <a href=""><i class="fas fa-chart-line"></i> Inventario</a>
+                <a href="#" id="linkUserManagement"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
             </nav>
         </div>
 
@@ -152,15 +152,15 @@ if (!isset($_SESSION['usuario'])) {
             </div>
 
             <div class="dashboard-buttons">
-                <button>Gestión Proveedores</button>
-                <button>Gestión Productos</button>
+                <button id="btnSuppliers">Gestión Proveedores</button>
+                <button id="btnProducts">Gestión Productos</button>
                 <button>Órdenes de Compra</button>
                 <button>Inventario</button>
                 <button id="btnUserManagement">Gestión Usuarios</button>
             </div>
 
             <div id="message" class="message success" style="display: none;">
-                ¡Bienvenido a tu panel de control! Tienes acceso completo a las funciones del sistema.
+                ¡Bienvenido a tu panel de control!
             </div>
         </div>
     </div>
@@ -176,13 +176,57 @@ if (!isset($_SESSION['usuario'])) {
             document.getElementById("message").style.display = "block";
         }, 500);
 
-        document.getElementById("btnUserManagement").addEventListener('click', () => {
+        // Gestión Usuarios
+        const handleUserManagementAccess = () => {
             if (userRole === 'Administrador') {
                 window.location.href = "usermanagement.html";
             } else {
                 window.location.href = "accessdenied.html";
             }
+        };
+
+        document.getElementById("btnUserManagement").addEventListener('click', handleUserManagementAccess);
+        document.getElementById("linkUserManagement").addEventListener('click', (e) => {
+            e.preventDefault(); 
+            handleUserManagementAccess();
         });
+
+        // Gestión Productos
+        const handleProductsAccess = () => {
+           
+            if (userRole === 'Administrador' || userRole === 'Comprador') {
+                window.location.href = "products.html";
+            } else {
+                window.location.href = "accessdenied.html";
+            }
+        };
+
+        document.getElementById("btnProducts").addEventListener('click', handleProductsAccess);
+        document.getElementById("linkProducts").addEventListener('click', (e) => {
+            e.preventDefault();
+            handleProductsAccess();
+        });
+
+        // Gestión Proveedores
+        const handleSuppliersAccess = () => {
+            if (userRole === 'Administrador') {
+                window.location.href = "suppliers.html";
+            } else {
+                window.location.href = "accessdenied.html";
+            }
+        };
+
+        document.getElementById("btnSuppliers").addEventListener('click', handleSuppliersAccess);
+        document.getElementById("linkSuppliers").addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSuppliersAccess();
+        });
+
+
+        
     </script>
+
+
+    
 </body>
 </html>

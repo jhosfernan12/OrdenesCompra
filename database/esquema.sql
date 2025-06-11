@@ -30,9 +30,11 @@ CREATE TABLE IF NOT EXISTS Productos (
     Nombre VARCHAR(100) NOT NULL,
     Descripcion TEXT NOT NULL,
     Precio DECIMAL(10,2) NOT NULL,
+    Moneda ENUM('PEN', 'USD') NOT NULL DEFAULT 'PEN',
     IDProveedor INT,
     FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor)
 );
+
 
 CREATE TABLE IF NOT EXISTS Inventario (
     IDInventario INT AUTO_INCREMENT PRIMARY KEY,

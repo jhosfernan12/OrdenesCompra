@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Proveedores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base */
+        body, html, input, button, select {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e7e7e7;
+            font-weight: 550;
+        }
+        
+        #app {
+            display: flex;
+            max-width: 1200px;
+            margin: 40px auto;
+            min-height: 600px;
+            box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        /* Contenido principal */
+        #mainContent {
+            flex: 1;
+            padding: 30px 25px;
+            box-sizing: border-box;
+            transition: flex 0.4s ease;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        #mainContent.shifted {
+            flex: 0 0 600px;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Botones */
+        button, input[type="submit"] {
+            background-color: #98AEFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            background-color: #7a96f5;
+            transform: translateY(-2px);
+        }
+
+        #dashboardBtn {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        /* Formularios */
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 8px 0 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #98AEFF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        
+        thead {
+            background-color: #98AEFF;
+            color: white;
+        }
+        
+        th, td {
+            padding: 12px 10px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f4ff;
+        }
+
+        /* Botones de acción */
+        .editBtn, .deleteBtn {
+            background-color: #98AEFF;
+            margin-right: 5px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .deleteBtn {
+            background-color: #dc3545;
+        }
+        
+        .editBtn:hover {
+            background-color: #7a96f5;
+        }
+        
+        .deleteBtn:hover {
+            background-color: #bd2130;
+        }
+
+        /* Formulario lateral */
+        #supplierForm {
+            flex: 0 0 0;
+            padding: 25px 20px;
+            box-sizing: border-box;
+            background: #f7f7f7;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+            transition: all 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #supplierForm.active {
+            flex: 0 0 400px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #supplierForm h3 {
+            margin-top: 0;
+            color: #444;
+        }
+
+        #cancelBtn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+        
+        #cancelBtn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* Toasts */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 320px;
+        }
+
+        .toast {
+            background: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+            font-size: 0.9rem;
+            user-select: none;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 0.95; transform: translateX(0); }
+        }
+
+        .toast.success {
+            background-color: #28a745;
+        }
+        
+        .toast.error {
+            background-color: #dc3545;
+        }
+        
+        .toast.info {
+            background-color: #007bff;
+        }
+        
+        .toast.warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .toast button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 15px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toast button:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* Confirmación */
+        .toast.confirm {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 15px 20px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .toast.confirm-buttons {
+            align-self: stretch;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .toast.confirm button {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 600;
+            padding: 8px 14px;
+        }
+        
+        .toast.confirm button.yes:hover {
+            background-color: #28a745;
+        }
+        
+        .toast.confirm button.no:hover {
+            background-color: #dc3545;
+        }
+
+        /* Enlaces en celdas */
+        td a {
+            color: #0066cc;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        td a:hover {
+            color: #004499;
+            text-decoration: underline;
+        }
+
+        /* Buscador */
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        #search {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        #search:focus {
+            border-color: #98AEFF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="mainContent">
+            <h1>Gestión de Proveedores</h1>
+            <button id="dashboardBtn">Volver al Dashboard</button>
+
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Buscar por nombre...">
+            </div>
+
+            <table id="supplierTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Dirección</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Botón de añadir proveedor debajo de la tabla -->
+            <div style="margin-top: 20px;">
+                <button onclick="showAddForm()">Añadir Proveedor</button>
+            </div>
+        </div>
+
+        <div id="supplierForm">
+            <h3 id="formTitle">Editar Proveedor</h3>
+            <form id="editForm" onsubmit="event.preventDefault(); submitForm();">
+                <input type="hidden" id="editID">
+                <label for="editNombre">Nombre:</label>
+                <input type="text" id="editNombre" required>
+                
+                <label for="editDireccion">Dirección:</label>
+                <input type="text" id="editDireccion" required>
+                
+                <label for="editTelefono">Teléfono:</label>
+                <input type="tel" id="editTelefono" pattern="\d{9}" title="9 dígitos" maxlength="9" required>
+                
+                <label for="editCorreo">Correo:</label>
+                <input type="email" id="editCorreo" required>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="submit" id="saveBtn">Guardar</button>
+                    <button type="button" id="cancelBtn" onclick="closeEdit()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+        let isAdding = false;
+        let suppliers = [];
+
+        const mainContent = document.getElementById('mainContent');
+        const supplierForm = document.getElementById('supplierForm');
+        const searchInput = document.getElementById('search');
+        const supplierTable = document.querySelector('#supplierTable tbody');
+        const dashboardBtn = document.getElementById('dashboardBtn');
+        const toastContainer = document.getElementById('toastContainer');
+
+        function showToast(message, type = 'info', duration = 4000) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.setAttribute('aria-label', 'Cerrar mensaje');
+            closeBtn.onclick = () => toastContainer.removeChild(toast);
+
+            toast.appendChild(closeBtn);
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) toastContainer.removeChild(toast);
+            }, duration);
+        }
+
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                const toast = document.createElement('div');
+                toast.className = 'toast confirm';
+                toast.setAttribute('role', 'alertdialog');
+
+                const msgSpan = document.createElement('div');
+                msgSpan.textContent = message;
+                toast.appendChild(msgSpan);
+
+                const btnsDiv = document.createElement('div');
+                btnsDiv.className = 'toast confirm-buttons';
+
+                const yesBtn = document.createElement('button');
+                yesBtn.textContent = 'Sí';
+                yesBtn.className = 'yes';
+                yesBtn.onclick = () => {
+                    toastContainer.removeChild(toast);
+                    resolve(true);
+                };
+
+                const noBtn = document.createElement('button');
+                noBtn.textContent = 'No';
+                noBtn.className = 'no';
+                noBtn.onclick = () => {
+                    toastContainer.removeChild(toast);
+                    resolve(false);
+                };
+
+                btnsDiv.appendChild(noBtn);
+                btnsDiv.appendChild(yesBtn);
+                toast.appendChild(btnsDiv);
+
+                toastContainer.appendChild(toast);
+            });
+        }
+
+        async function loadSuppliers() {
+            try {
+                const search = searchInput.value;
+                const response = await fetch(`../actions/suppliers.php?action=list&search=${encodeURIComponent(search)}`);
+                const data = await response.json();
+                suppliers = data;
+                renderSuppliers();
+            } catch (error) {
+                showToast('Error al cargar proveedores', 'error');
+                console.error(error);
+            }
+        }
+
+        function renderSuppliers() {
+            supplierTable.innerHTML = '';
+            suppliers.forEach(supplier => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${supplier.IDProveedor}</td>
+                    <td>${supplier.Nombre}</td>
+                    <td><a href="tel:${supplier.Telefono}">${supplier.Telefono}</a></td>
+                    <td><a href="mailto:${supplier.Correo}">${supplier.Correo}</a></td>
+                    <td>${supplier.Direccion}</td>
+                    <td>${supplier.FechaRegistro}</td>
+                    <td>
+                        <button class="editBtn" onclick="editSupplier(${supplier.IDProveedor})">Editar</button>
+                        <button class="deleteBtn" onclick="deleteSupplier(${supplier.IDProveedor})">Eliminar</button>
+                    </td>
+                `;
+                supplierTable.appendChild(row);
+            });
+        }
+
+        async function editSupplier(id) {
+            try {
+                isAdding = false;
+                const response = await fetch(`../actions/suppliers.php?action=get&id=${id}`);
+                const supplier = await response.json();
+
+                document.getElementById('formTitle').textContent = "Editar Proveedor";
+                document.getElementById('editID').value = supplier.IDProveedor;
+                document.getElementById('editNombre').value = supplier.Nombre;
+                document.getElementById('editDireccion').value = supplier.Direccion;
+                document.getElementById('editTelefono').value = supplier.Telefono;
+                document.getElementById('editCorreo').value = supplier.Correo;
+
+                showForm();
+            } catch (error) {
+                showToast('Error al cargar proveedor', 'error');
+                console.error(error);
+            }
+        }
+
+        function showAddForm() {
+            isAdding = true;
+            document.getElementById('formTitle').textContent = "Añadir Proveedor";
+            document.getElementById('editID').value = '';
+            document.getElementById('editNombre').value = '';
+            document.getElementById('editDireccion').value = '';
+            document.getElementById('editTelefono').value = '';
+            document.getElementById('editCorreo').value = '';
+            showForm();
+        }
+
+        function showForm() {
+            supplierForm.classList.add('active');
+            mainContent.classList.add('shifted');
+        }
+
+        function closeEdit() {
+            supplierForm.classList.remove('active');
+            mainContent.classList.remove('shifted');
+        }
+
+        async function submitForm() {
+            const id = document.getElementById('editID').value;
+            const nombre = document.getElementById('editNombre').value.trim();
+            const direccion = document.getElementById('editDireccion').value.trim();
+            const telefono = document.getElementById('editTelefono').value.trim();
+            const correo = document.getElementById('editCorreo').value.trim();
+
+            if (!nombre || !direccion || !telefono || !correo) {
+                showToast('Todos los campos son obligatorios', 'warning');
+                return;
+            }
+
+            if (!/^\d{9}$/.test(telefono)) {
+                showToast('El teléfono debe tener 9 dígitos', 'warning');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+                showToast('Ingrese un correo válido', 'warning');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("Nombre", nombre);
+            formData.append("Direccion", direccion);
+            formData.append("Telefono", telefono);
+            formData.append("Correo", correo);
+
+            try {
+                let url, action;
+
+                if (isAdding) {
+                    url = '../actions/suppliers.php?action=add';
+                    action = 'añadido';
+                } else {
+                    url = '../actions/suppliers.php?action=update';
+                    formData.append("IDProveedor", id);
+                    action = 'actualizado';
+                }
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === "OK") {
+                    showToast(`Proveedor ${action} correctamente`, 'success');
+                    closeEdit();
+                    loadSuppliers();
+                } else {
+                    showToast(`Error al ${isAdding ? 'añadir' : 'actualizar'} proveedor`, 'error');
+                }
+            } catch (error) {
+                showToast('Error de conexión', 'error');
+                console.error(error);
+            }
+        }
+
+        async function deleteSupplier(id) {
+            const confirmed = await showConfirm("¿Está seguro de eliminar este proveedor?");
+            if (!confirmed) return;
+
+            try {
+                const formData = new FormData();
+                formData.append("IDProveedor", id);
+
+                const response = await fetch('../actions/suppliers.php?action=delete', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === "OK") {
+                    showToast('Proveedor eliminado', 'success');
+                    loadSuppliers();
+                } else {
+                    showToast('Error al eliminar proveedor', 'error');
+                }
+            } catch (error) {
+                showToast('Error de conexión', 'error');
+                console.error(error);
+            }
+        }
+
+        dashboardBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.php';
+        });
+
+        // Búsqueda automática en tiempo real
+        searchInput.addEventListener('input', () => {
+            loadSuppliers();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSuppliers();
+        });
+    </script>
+</body>
+
+</html>
