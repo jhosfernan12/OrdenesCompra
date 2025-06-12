@@ -60,7 +60,7 @@
 
     #dashboardBtn {
       margin-bottom: 15px;
-      width: 100%;
+      width: 35%;
     }
 
     input[type="text"],
@@ -296,7 +296,9 @@
     <div id="mainContent">
       <h1>Gestión de Productos</h1>
 
-      <button id="dashboardBtn" role="button" aria-label="Volver al dashboard">Volver al Dashboard</button>
+      <div style="margin-bottom: 10px;">
+          <button id="dashboardBtn" class="btn">← Regresar al Dashboard</button>
+     </div>
 
       <div>
         <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
@@ -317,7 +319,7 @@
         </tbody>
       </table>
 
-      <button id="addProductBtn">Agregar Producto</button>
+      <button id="addProductBtn"> + Agregar Producto</button>
     </div>
 
     <div id="formSection" aria-hidden="true">

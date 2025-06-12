@@ -64,8 +64,8 @@
         }
 
         #dashboardBtn {
-            margin-bottom: 15px;
-            width: 100%;
+            margin-bottom: 5px;
+            width: 35%;
         }
 
         /* Formularios */
@@ -322,7 +322,10 @@
     <div id="app">
         <div id="mainContent">
             <h1>Gestión de Proveedores</h1>
-            <button id="dashboardBtn">Volver al Dashboard</button>
+            <div style="margin-bottom: 10px;">
+                <button id="dashboardBtn" class="btn">← Regresar al Dashboard</button>
+
+            </div>
 
             <div class="search-container">
                 <input type="text" id="search" placeholder="Buscar por nombre...">
@@ -345,7 +348,7 @@
 
             <!-- Botón de añadir proveedor debajo de la tabla -->
             <div style="margin-top: 20px;">
-                <button onclick="showAddForm()">Añadir Proveedor</button>
+                <button onclick="showAddForm()">+ Agregar Proveedor</button>
             </div>
         </div>
 

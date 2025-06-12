@@ -48,15 +48,15 @@ CREATE TABLE IF NOT EXISTS Productos (
     Moneda ENUM('PEN', 'USD') NOT NULL DEFAULT 'PEN',
     IDProveedor INT,
     FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor)
-);");
+)");
 
 
 $conn->query("
 CREATE TABLE IF NOT EXISTS Inventario (
     IDInventario INT AUTO_INCREMENT PRIMARY KEY,
     IDProducto INT NOT NULL,
-    StockActual INT NOT NULL,        
-    StockMinimo INT NOT NULL,        
+    StockActual INT NOT NULL,
+    StockMinimo INT NOT NULL,
     FechaUltimaActualizacion DATE NOT NULL,
     FOREIGN KEY (IDProducto) REFERENCES Productos(IDProducto)
 )");
@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS OrdenesCompra (
     IDOrden INT AUTO_INCREMENT PRIMARY KEY,
     FechaOrden DATE NOT NULL,
     Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
+    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN', 
     IDProveedor INT,
     IDUsuario INT,
     FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor),

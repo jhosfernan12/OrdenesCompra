@@ -16,31 +16,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
             if (password_verify($contrasena, $user['Contrasena'])) {
-                // Guardar datos en sesión
+                // ✅ Guardar datos en la sesión
                 $_SESSION['usuario'] = $user['Nombre'];
                 $_SESSION['rol'] = $user['Rol'];
 
-                // Redirigir al dashboard
+                // ✅ Esto es lo que necesita tu frontend
+                $_SESSION['user'] = [
+                    'id' => $user['IDUsuario'],
+                    'name' => $user['Nombre']
+                ];
+
+                // ✅ Redirigir al dashboard
                 header("Location: ../screens/dashboard.php");
                 exit();
             } else {
+                // ❌ Contraseña incorrecta
                 header("Location: ../screens/login.html?error=Usuario y/o Contraseña incorrecta.");
                 exit();
             }
         } else {
+            // ❌ Usuario no encontrado
             header("Location: ../screens/login.html?error=Usuario y/o Contraseña incorrecta");
             exit();
         }
     } else {
+        // ❌ Campos vacíos
         header("Location: ../screens/login.html?error=Por favor, ingresa todos los campos.");
         exit();
     }
 } else {
-    // Acceso directo a login.php sin POST
+    // ❌ Acceso directo sin POST
     header("Location: ../screens/login.html");
     exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">

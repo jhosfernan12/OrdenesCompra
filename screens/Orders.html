@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Órdenes de Compra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base */
+       body, html, input, button, select {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            font-weight: 550;
+        }
+        
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Encabezado */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        /* Botones principales */
+        .btn {
+            background-color: #98AEFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: #7a96f5;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Barra de búsqueda */
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #98AEFF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+        
+        /* Tabla de órdenes */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .orders-table thead {
+            background-color: #98AEFF;
+            color: white;
+        }
+        
+        .orders-table th, 
+        .orders-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .orders-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        /* Formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #98AEFF;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+        
+        /* Productos seleccionados */
+        .selected-products {
+            margin: 20px 0;
+        }
+        
+        .selected-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .selected-products-table th,
+        .selected-products-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        
+        .selected-products-table th {
+            background-color: #f8f9fa;
+        }
+        
+        /* Modal de vista */
+        .view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .view-modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .view-modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .view-modal-title {
+            margin: 0;
+            color: #333;
+        }
+        
+        .order-info {
+            margin-bottom: 30px;
+        }
+        
+        .order-info-section {
+            margin-bottom: 20px;
+        }
+        
+        .order-info-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .order-info-content {
+            padding-left: 20px;
+        }
+        
+        /* Toasts */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 320px;
+        }
+        
+        .toast {
+            background: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+            font-size: 0.9rem;
+            user-select: none;
+            position: relative;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 0.95; transform: translateX(0); }
+        }
+        
+        .toast.success {
+            background-color: #28a745;
+        }
+        
+        .toast.error {
+            background-color: #dc3545;
+        }
+        
+        .toast.info {
+            background-color: #007bff;
+        }
+        
+        .toast.warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+        
+        .toast button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 15px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toast button:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .modal-content,
+            .view-modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* Efectos de carga */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Órdenes de Compra</h1>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <button onclick="window.location.href='dashboard.php'" class="btn">← Regresar al Dashboard</button>
+        </div>
+
+        
+        <div class="search-bar">
+            <input type="text" id="searchProvider" class="search-input" placeholder="Buscar por proveedor...">
+        </div>
+        
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Proveedor</th>
+                    <th>Solicitante</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">          
+            </tbody>
+        </table>
+
+        <div style="margin-top: 20px;">
+            <button id="btnNewOrder" class="btn">+ Nueva Orden de Compra</button>
+        </div>
+    </div>
+    
+    <!-- Modal para crear/editar orden -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="btnCancelModal">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nueva Orden de Compra</h2>
+            </div>
+            
+            <form id="orderForm">
+                <input type="hidden" id="orderId">
+                
+                <div class="form-group">
+                    <label for="providerSelect" class="form-label">Proveedor:</label>
+                    <select id="providerSelect" class="form-control" required>
+                        <option value="">Seleccione un proveedor</option>
+                        <!-- Proveedores se cargarán dinámicamente -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Agregar Producto:</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="productSelect" class="form-control" style="flex: 3;" disabled>
+                            <option value="">Seleccione un producto</option>
+                        </select>
+                        <input type="number" id="productQuantity" class="form-control" style="flex: 1;" min="1" value="1" disabled>
+                        <button type="button" id="btnAddProduct" class="btn" style="flex: 2;">Agregar</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderStatus" class="form-label">Estado:</label>
+                    <select id="orderStatus" class="form-control" required>
+                        <option value="Pendiente" selected>Pendiente</option>
+                        <option value="Entregada">Entregada</option>
+                        <option value="Cancelada">Cancelada</option>
+                        <option value="Rechazada">Rechazada</option>
+                    </select>
+                </div>
+                
+                <div class="selected-products">
+                    <h3>Productos seleccionados:</h3>
+                    <table class="selected-products-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selectedProductsBody">
+                            <!-- Productos seleccionados aparecerán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" id="btnSaveOrder" class="btn">Guardar Orden</button>
+                    <button type="close-btn" id="btnCancelModal" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal para visualizar orden -->
+    <div id="viewOrderModal" class="view-modal">
+        <div class="view-modal-content">
+            <div class="view-modal-header">
+                <h2 class="view-modal-title" id="viewModalTitle">Detalles de Orden de Compra</h2>
+                <button class="close-btn" onclick="closeViewModal()">&times;</button>
+            </div>
+            
+            <div class="order-info">
+                <div>
+                    <strong>N° Orden:</strong> <span id="viewOrderId"></span><br>
+                    <strong>Fecha:</strong> <span id="viewOrderDate"></span><br>
+                    <strong>Estado:</strong> <span id="viewOrderStatus"></span>
+                </div>
+                
+                <div class="order-info-section">
+                    <h3>Proveedor:</h3>
+                    <div class="order-info-content" id="viewProviderInfo"></div>
+                </div>
+                
+                <div class="order-info-section">
+                    <h3>Solicitante:</h3>
+                    <div class="order-info-content" id="viewUserInfo"></div>
+                </div>
+                
+                <div class="order-info-section">
+                    <h3>Productos:</h3>
+                    <table class="selected-products-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Cantidad</th>
+                                <th>P. Unitario</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewProductsTableBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" style="text-align:right;"><strong>TOTAL:</strong></td>
+                                <td id="viewOrderTotal"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end;">
+                <button onclick="printOrder(document.getElementById('viewOrderId').textContent)" class="btn">Imprimir PDF</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenedor para toasts -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+    
+    <script>
+        // Variables globales
+        let currentUser = null;
+
+
+    async function loadCurrentUser() {
+        try {
+            const response = await fetch('../actions/Orders.php?action=getCurrentUser', {
+                credentials: 'include' // 👈 NECESARIO
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                currentUser = data.user;
+                console.log("✅ Usuario cargado:", currentUser);
+            } else {
+                showToast('⚠️ Usuario no cargado. Recarga la página o inicia sesión.', 'error');
+            }
+        } catch (error) {
+            console.error('❌ Error al cargar el usuario:', error);
+        }
+    }
+
+
+    // Ejecutar cuando cargue el DOM
+    window.addEventListener('DOMContentLoaded', async () => {
+        await loadCurrentUser();
+        // Puedes cargar otras cosas aquí:
+        loadOrders();
+        loadProviders();
+    });
+        
+        // Función para mostrar toasts
+        function showToast(message, type = 'info', duration = 4000) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.setAttribute('aria-label', 'Cerrar mensaje');
+            closeBtn.onclick = () => toastContainer.removeChild(toast);
+
+            toast.appendChild(closeBtn);
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) toastContainer.removeChild(toast);
+            }, duration);
+        }
+        
+        // Función para confirmación con toast
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                const toast = document.createElement('div');
+                toast.className = 'toast confirm';
+                toast.setAttribute('role', 'alertdialog');
+                toast.setAttribute('aria-modal', 'true');
+
+                const msgSpan = document.createElement('div');
+                msgSpan.textContent = message;
+                toast.appendChild(msgSpan);
+
+                const btnsDiv = document.createElement('div');
+                btnsDiv.className = 'toast confirm-buttons';
+
+                const yesBtn = document.createElement('button');
+                yesBtn.textContent = 'Sí';
+                yesBtn.className = 'yes';
+                yesBtn.onclick = () => {
+                    if (toast.parentNode) toastContainer.removeChild(toast);
+                    resolve(true);
+                };
+
+                const noBtn = document.createElement('button');
+                noBtn.textContent = 'No';
+                noBtn.className = 'no';
+                noBtn.onclick = () => {
+                    if (toast.parentNode) toastContainer.removeChild(toast);
+                    resolve(false);
+                };
+
+                btnsDiv.appendChild(noBtn);
+                btnsDiv.appendChild(yesBtn);
+                toast.appendChild(btnsDiv);
+
+                toastContainer.appendChild(toast);
+            });
+        }
+        
+        // Función para cargar las órdenes
+        async function loadOrders(filter = '') {
+            try {
+                document.getElementById('ordersTableBody').classList.add('loading');
+                
+                const response = await fetch(`../actions/Orders.php?action=getOrders&filter=${filter}`);
+                const data = await response.json();
+                
+                const tbody = document.getElementById('ordersTableBody');
+                tbody.innerHTML = '';
+                tbody.classList.remove('loading');
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al cargar las órdenes');
+                }
+                
+                data.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.IDOrden}</td>
+                        <td>${order.FechaOrden}</td>
+                        <td><span class="status-badge ${getStatusClass(order.Estado)}">${order.Estado}</span></td>
+                        <td>${order.Proveedor}</td>
+                        <td>${order.Solicitante}</td>
+                        <td>
+                            <button class="btn" onclick="viewOrderDetails(${order.IDOrden})">Ver</button>
+                            <button class="btn" onclick="editOrder(${order.IDOrden})">Editar</button>
+                            <button class="btn btn-danger" onclick="deleteOrder(${order.IDOrden})">Eliminar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById('ordersTableBody').classList.remove('loading');
+                showToast('Error al cargar órdenes: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+        
+        // Función para obtener clase CSS según estado
+        function getStatusClass(status) {
+            const statusClasses = {
+                'Pendiente': 'status-pending',
+                'Entregada': 'status-delivered',
+                'Cancelada': 'status-cancelled',
+                'Rechazada': 'status-rejected'
+            };
+            return statusClasses[status] || '';
+        }
+        
+        // Función para cargar proveedores
+        async function loadProviders() {
+            try {
+                const response = await fetch('../actions/Orders.php?action=getProviders');
+                const data = await response.json();
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al cargar proveedores');
+                }
+                
+                const select = document.getElementById('providerSelect');
+                select.innerHTML = '<option value="">Seleccione un proveedor</option>';
+                
+                data.forEach(provider => {
+                    const option = document.createElement('option');
+                    option.value = provider.IDProveedor;
+                    option.textContent = provider.Nombre;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showToast('Error al cargar proveedores: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+        
+        // Función para cargar productos de un proveedor
+        async function loadProducts(providerId) {
+            if (!providerId) {
+                document.getElementById('productSelect').disabled = true;
+                document.getElementById('productQuantity').disabled = true;
+                return;
+            }
+
+            const currentProvider = document.getElementById('providerSelect').dataset.currentProvider;
+            if (currentProvider && currentProvider != providerId) {
+                const confirmed = await showConfirm("¿Cambiar de proveedor? Esto borrará los productos ya agregados.");
+                if (!confirmed) {
+                    document.getElementById('providerSelect').value = currentProvider;
+                    return;
+                }
+                document.getElementById('selectedProductsBody').innerHTML = '';
+            }
+            
+            try {
+                document.getElementById('productSelect').disabled = true;
+                document.getElementById('productSelect').innerHTML = '<option value="">Cargando productos...</option>';
+                
+                const response = await fetch(`../actions/Orders.php?action=getProducts&providerId=${providerId}`);
+                const data = await response.json();
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al cargar productos');
+                }
+                
+                const select = document.getElementById('productSelect');
+                select.innerHTML = '<option value="">Seleccione un producto</option>';
+                select.disabled = false;
+                
+                data.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.IDProducto;
+                    option.textContent = `${product.Nombre} (${product.Precio} ${product.Moneda})`;
+                    option.dataset.price = product.Precio;
+                    option.dataset.moneda = product.Moneda;
+                    select.appendChild(option);
+                });
+                
+                document.getElementById('productQuantity').disabled = false;
+                document.getElementById('providerSelect').dataset.currentProvider = providerId;
+            } catch (error) {
+                showToast('Error al cargar productos: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+        
+        // Función para mostrar el modal
+        function showModal(isNew = true) {
+            document.getElementById('modalTitle').textContent = isNew ? 'Nueva Orden de Compra' : 'Editar Orden de Compra';
+            document.getElementById('orderId').value = '';
+            document.getElementById('providerSelect').value = '';
+            document.getElementById('productSelect').innerHTML = '<option value="">Seleccione un producto</option>';
+            document.getElementById('productSelect').disabled = true;
+            document.getElementById('productQuantity').disabled = true;
+            document.getElementById('productQuantity').value = '1';
+            document.getElementById('selectedProductsBody').innerHTML = '';
+            document.getElementById('orderStatus').value = 'Pendiente';
+            
+            if (isNew) {
+                loadProviders();
+            }
+            
+            document.getElementById('orderModal').style.display = 'block';
+        }
+        
+        // Función para agregar producto a la lista
+        function addProductToList() {
+            const productSelect = document.getElementById('productSelect');
+            const quantity = document.getElementById('productQuantity').value;
+            
+            if (!productSelect.value || !quantity) {
+                showToast('Seleccione un producto y cantidad', 'warning');
+                return;
+            }
+            
+            const selectedProduct = productSelect.options[productSelect.selectedIndex];
+            const price = selectedProduct.dataset.price;
+            const moneda = selectedProduct.dataset.moneda || 'USD';
+            
+            // Verificar si el producto ya fue agregado
+            const existingProduct = document.querySelector(`#selectedProductsBody tr[data-product-id="${productSelect.value}"]`);
+            if (existingProduct) {
+                showToast('Este producto ya fue agregado', 'warning');
+                return;
+            }
+            
+            const total = (price * quantity).toFixed(2);
+            
+            const row = document.createElement('tr');
+            row.dataset.productId = productSelect.value;
+            row.dataset.moneda = moneda;
+            row.dataset.price = price;
+            row.innerHTML = `
+                <td>${selectedProduct.textContent.split(' (')[0]}</td>
+                <td>${quantity}</td>
+                <td>${price} ${moneda}</td>
+                <td>${total} ${moneda}</td>
+                <td><button class="btn btn-danger" onclick="removeProductFromList(this)">Eliminar</button></td>
+            `;
+            document.getElementById('selectedProductsBody').appendChild(row);
+            
+            // Limpiar selección
+            productSelect.value = '';
+            document.getElementById('productQuantity').value = '1';
+        }
+        
+        // Función para eliminar producto de la lista
+        function removeProductFromList(button) {
+            button.closest('tr').remove();
+            
+            // Si no quedan productos, habilitar cambio de proveedor
+            if (document.querySelectorAll('#selectedProductsBody tr').length === 0) {
+                document.getElementById('providerSelect').disabled = false;
+            }
+        }
+        
+        // Función para guardar la orden
+        // Función para guardar la orden
+        async function saveOrder() {
+            // ✅ Validar que el usuario esté cargado
+            if (!currentUser || !currentUser.id) {
+                showToast('Error: Usuario no cargado. Recarga la página o espera unos segundos.', 'error');
+                return;
+            }
+
+            const providerId = document.getElementById('providerSelect').value;
+            const orderId = document.getElementById('orderId').value;
+            const status = document.getElementById('orderStatus').value;
+            const isEdit = !!orderId;
+            const products = [];
+
+            // Validar proveedor
+            if (!providerId) {
+                showToast('Debe seleccionar un proveedor', 'warning');
+                return;
+            }
+
+            // Validar productos
+            const productRows = document.querySelectorAll('#selectedProductsBody tr');
+            if (productRows.length === 0) {
+                showToast('Debe agregar al menos un producto', 'warning');
+                return;
+            }
+
+            // Obtener la moneda de referencia (del primer producto)
+            const firstProductRow = productRows[0];
+            const monedaReferencia = firstProductRow.dataset.moneda || 'USD';
+
+            // Validar que todos los productos tengan la misma moneda
+            let monedaInvalida = false;
+            productRows.forEach(row => {
+                const productMoneda = row.dataset.moneda || 'USD';
+                if (productMoneda !== monedaReferencia) {
+                    monedaInvalida = true;
+                }
+
+                products.push({
+                    id: row.dataset.productId,
+                    quantity: row.cells[1].textContent,
+                    price: row.dataset.price,
+                    moneda: productMoneda
+                });
+            });
+
+            if (monedaInvalida) {
+                showToast(`Error: Todos los productos deben ser en ${monedaReferencia}. No se puede mezclar monedas.`, 'error');
+                return;
+            }
+
+            const orderData = {
+                orderId: orderId,
+                providerId: providerId,
+                userId: currentUser.id, // 
+                products: products,
+                status: status,
+                moneda: monedaReferencia
+            };
+
+            try {
+                const endpoint = isEdit ? 'updateOrder' : 'saveOrder';
+                const response = await fetch(`../actions/Orders.php?action=${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al guardar la orden');
+                }
+
+                showToast(`Orden ${isEdit ? 'actualizada' : 'creada'} correctamente`, 'success');
+                document.getElementById('orderModal').style.display = 'none';
+                loadOrders();
+            } catch (error) {
+                showToast('Error al guardar la orden: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        
+        // Función para ver detalles de la orden
+        async function viewOrderDetails(orderId) {
+            try {
+                document.getElementById('viewOrderModal').style.display = 'block';
+                document.getElementById('viewModalTitle').textContent = `Detalles de Orden #${orderId}`;
+                
+                const response = await fetch(`../actions/Orders.php?action=getFullOrder&orderId=${orderId}`);
+                const data = await response.json();
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al cargar la orden');
+                }
+                
+                // Llenar datos básicos
+                document.getElementById('viewOrderId').textContent = orderId;
+                document.getElementById('viewOrderDate').textContent = data.order.FechaOrden;
+                document.getElementById('viewOrderStatus').textContent = data.order.Estado;
+                
+                // Info Proveedor
+                const provider = data.provider || {};
+                document.getElementById('viewProviderInfo').innerHTML = `
+                    <p><strong>Nombre:</strong> ${provider.Nombre || 'N/A'}</p>
+                    <p><strong>Dirección:</strong> ${provider.Direccion || 'N/A'}</p>
+                    <p><strong>Teléfono:</strong> ${provider.Telefono || 'N/A'}</p>
+                    <p><strong>Correo:</strong> ${provider.Correo || 'N/A'}</p>
+                `;
+                
+                // Info Usuario
+                const user = data.user || {};
+                document.getElementById('viewUserInfo').innerHTML = `
+                    <p><strong>Nombre:</strong> ${user.Nombre || 'N/A'}</p>
+                    <p><strong>Correo:</strong> ${user.Correo || 'N/A'}</p>
+                `;
+                
+                // Productos
+                const tbody = document.getElementById('viewProductsTableBody');
+                tbody.innerHTML = '';
+                let total = 0;
+                const moneda = data.products.length > 0 ? data.products[0].Moneda : 'USD';
+
+                if (data.products && data.products.length > 0) {
+                    // Agrupar productos duplicados
+                    const productosAgrupados = {};
+                    data.products.forEach(product => {
+                        const key = `${product.IDProducto}-${product.PrecioUnitario}`;
+                        if (!productosAgrupados[key]) {
+                            productosAgrupados[key] = {
+                                ...product,
+                                Cantidad: 0
+                            };
+                        }
+                        productosAgrupados[key].Cantidad += parseInt(product.Cantidad);
+                    });
+
+                    // Mostrar productos agrupados
+                    Object.values(productosAgrupados).forEach(product => {
+                        const precioUnitario = parseFloat(product.PrecioUnitario) || 0;
+                        const cantidad = parseInt(product.Cantidad) || 0;
+                        const subtotal = cantidad * precioUnitario;
+                        total += subtotal;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${product.IDProducto}</td>
+                            <td>${product.Nombre}</td>
+                            <td>${cantidad}</td>
+                            <td>${precioUnitario.toFixed(2)} ${product.Moneda || 'USD'}</td>
+                            <td>${subtotal.toFixed(2)} ${product.Moneda || 'USD'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="5" style="text-align:center;">No hay productos en esta orden</td>';
+                    tbody.appendChild(row);
+                }
+                
+                // Total
+                document.getElementById('viewOrderTotal').textContent = `${total.toFixed(2)} ${moneda || 'USD'}`;
+            } catch (error) {
+                showToast('Error al cargar detalles de la orden: ' + error.message, 'error');
+                console.error('Error:', error);
+                closeViewModal();
+            }
+        }
+        
+        // Función para cerrar el modal de visualización
+        function closeViewModal() {
+            document.getElementById('viewOrderModal').style.display = 'none';
+        }
+        
+        // Función para editar orden
+        async function editOrder(orderId) {
+            try {
+                showModal(false);
+                document.getElementById('modalTitle').textContent = `Editar Orden #${orderId}`;
+                document.getElementById('orderId').value = orderId;
+                
+                // Cargar proveedores
+                await loadProviders();
+                
+                // Obtener datos de la orden
+                const response = await fetch(`../actions/Orders.php?action=getOrderDetails&orderId=${orderId}`);
+                const data = await response.json();
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al cargar la orden');
+                }
+                
+                // Establecer el estado actual
+                document.getElementById('orderStatus').value = data.order.Estado;
+                
+                // Establecer proveedor
+                const providerSelect = document.getElementById('providerSelect');
+                providerSelect.value = data.order.IDProveedor;
+                providerSelect.dataset.currentProvider = data.order.IDProveedor;
+                
+                // Cargar productos del proveedor
+                await loadProducts(data.order.IDProveedor);
+                
+                // Cargar productos seleccionados
+                const tbody = document.getElementById('selectedProductsBody');
+                tbody.innerHTML = '';
+                
+                if (data.products && data.products.length > 0) {
+                    data.products.forEach(product => {
+                        const row = document.createElement('tr');
+                        row.dataset.productId = product.IDProducto;
+                        row.dataset.moneda = product.Moneda || 'USD';
+                        row.dataset.price = product.PrecioUnitario;
+                        row.innerHTML = `
+                            <td>${product.Nombre}</td>
+                            <td>${product.Cantidad}</td>
+                            <td>${product.PrecioUnitario} ${product.Moneda || 'USD'}</td>
+                            <td>${(product.Cantidad * product.PrecioUnitario).toFixed(2)} ${product.Moneda || 'USD'}</td>
+                            <td><button class="btn btn-danger" onclick="removeProductFromList(this)">Eliminar</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                showToast('Error al cargar la orden para editar: ' + error.message, 'error');
+                console.error('Error:', error);
+                document.getElementById('orderModal').style.display = 'none';
+            }
+        }
+        
+        // Función para eliminar orden
+        async function deleteOrder(orderId) {
+            try {
+                const confirmed = await showConfirm(`¿Está seguro de eliminar la orden ${orderId}?`);
+                if (!confirmed) return;
+                
+                const response = await fetch(`../actions/Orders.php?action=deleteOrder&orderId=${orderId}`);
+                const data = await response.json();
+                
+                if (!data || data.error) {
+                    throw new Error(data?.message || 'Error al eliminar la orden');
+                }
+                
+                showToast('Orden eliminada correctamente', 'success');
+                loadOrders();
+            } catch (error) {
+                showToast('Error al eliminar la orden: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
+        }
+        
+        // Función para imprimir orden (PDF)
+        function printOrder(orderId) {
+            window.open(`../actions/generate_pdf.php?orderId=${orderId}`, '_blank');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+            
+            
+            document.getElementById('btnNewOrder').addEventListener('click', () => showModal(true));
+            document.getElementById('btnCancelModal').addEventListener('click', () => {
+                document.getElementById('orderModal').style.display = 'none';
+            });
+            
+            document.getElementById('providerSelect').addEventListener('change', (e) => {
+                loadProducts(e.target.value);
+            });
+            
+            document.getElementById('btnAddProduct').addEventListener('click', addProductToList);
+            document.getElementById('btnSaveOrder').addEventListener('click', saveOrder);
+            
+            document.getElementById('searchProvider').addEventListener('input', (e) => {
+                loadOrders(e.target.value);
+            });
+
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.textContent === 'Ver' && e.target.parentNode.parentNode.tagName === 'TR') {
+                const orderId = e.target.parentNode.parentNode.cells[0].textContent;
+                viewOrderDetails(orderId);
+            }
+        });
+
+        });
+    </script>
+</body>
+</html>
