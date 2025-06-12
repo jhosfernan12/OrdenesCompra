@@ -9,7 +9,7 @@
 /* Estilos del cuerpo */
 body {
     
-    background-color: #e9f8fa;
+    background-color: #f1e9fa;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,7 +33,7 @@ body {
 
 /* Efecto de sombra y elevación al pasar el mouse */
 .wrapper:hover {
-    box-shadow: 0px 10px 35px rgba(0, 170, 200, 0.3);
+    box-shadow: 0px 10px 35px rgba(162, 0, 255, 0.452);
     transform: translateY(-4px);
 }
 
@@ -57,7 +57,7 @@ body {
 h2 {
     font-size: 1.9em;
     margin-bottom: 20px;
-    color: #98AEFF; /* Celeste profundo */
+    color: #562870; /* Celeste profundo */
 }
 
 /* Estilos del formulario */
@@ -70,16 +70,18 @@ form {
 /* Labels */
 label {
     font-size: 1em;
-    color: #98AEFF; /* Turquesa claro */
+    color: #562870; /* Turquesa claro */ 
+
     margin-bottom: 5px;
     text-align: left;
 }
+
 
 /* Campos de entrada */
 input[type="text"], input[type="password"], input[type="email"] {
     padding: 12px;
     font-size: 1em;
-    border: 1px solid #b2ebf2;
+    border: 1px solid #562870;
     border-radius: 20px;  /* Redondear los bordes */
     background-color: #f6feff;
     outline: none;
@@ -91,8 +93,8 @@ input[type="text"], input[type="password"], input[type="email"] {
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
-    border-color: #00bcd4;
-    box-shadow: 0 0 8px rgba(0, 188, 212, 0.4);  /* Sombra al enfocar */
+    border-color: #562870;
+    box-shadow: 0 0 8px #530083;  /* Sombra al enfocar */
     background-color: #ffffff;
 }
 
@@ -100,19 +102,19 @@ input[type="email"]:focus {
 /* Botones */
 input[type="submit"] {
     padding: 12px;
-    background-color: #98AEFF;
+    background-color: #562870;
     color: white;
     border: none;
     border-radius: 20px;
     font-size: 1.1em;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 4px 10px #0000004d;
     margin-top: 10px; /* Se agrega margen arriba para separar el botón del campo de contraseña */
 }
 
 input[type="submit"]:hover {
-    background-color: #839cf8;
+    background-color: #6d338f;
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
     transform: scale(1.02);
 }
@@ -142,18 +144,18 @@ input[type="submit"]:hover {
 p {
     margin-top: 15px;
     font-size: 0.9em;
-    color: #007c91;
+    color: #562870;
 }
 
 a {
-    color: #2898a7;
+    color: #79399e;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 a:hover {
     text-decoration: underline;
-    color: #00838f;
+    color: #a450d4;
 }
 
 /* Contenedor del campo de contraseña con ícono */
@@ -228,7 +230,7 @@ a:hover {
 
 
 .sidebar-nav a:hover {
-    background-color: rgba(30, 167, 185, 0.582); /* fondo sutil al pasar el mouse */
+    background-color: #79399e; /* fondo sutil al pasar el mouse */
     color: #ffffff;
     text-decoration: none;
     transform: translateX(5px);
@@ -246,7 +248,7 @@ a:hover {
 }
 
 .sidebar a:hover {
-    background-color: #33c9dc; /* azul celeste más claro */
+    background-color: #562870; /* azul celeste más claro */
     color: #ffffff; /* un tono más oscuro para contraste */
     font-size: 1.15em;
 }
@@ -268,7 +270,7 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #007c91;
+    background-color: #562870;
     color: white;
     border-radius: 10px;
     padding: 10px 20px;
@@ -305,7 +307,7 @@ a:hover {
 .dashboard-buttons button {
     padding: 20px;
     font-size: 1.1em;
-    background-color: #00acc1;
+    background-color: #562870;
     color: white;
     border: none;
     border-radius: 12px;  /* Redondear más los bordes */
@@ -315,7 +317,7 @@ a:hover {
 }
 
 .dashboard-buttons button:hover {
-    background-color: #47a0bb;
+    background-color: #6d338f;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);  /* Sombra más fuerte al hacer hover */
 }
 

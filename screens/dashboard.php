@@ -27,7 +27,7 @@ if (!isset($_SESSION['usuario'])) {
             background-color: #f0f8f3;
         }
         .sidebar {
-            background-color:rgb(129, 156, 253);
+            background-color: #562870;
             color: #fff;
             width: 250px;
             padding: 20px;
@@ -51,7 +51,7 @@ if (!isset($_SESSION['usuario'])) {
             transition: background-color 0.3s ease;
         }
         .sidebar a:hover {
-            background-color:hsla(194, 44.90%, 34.90%, 0.48);
+            background-color:hsla(293, 41.20%, 48.00%, 0.48);
         }
         .main-content {
             margin-left: 250px;
@@ -73,7 +73,7 @@ if (!isset($_SESSION['usuario'])) {
         }
         .top-bar h1 {
             font-size: 1.8em;
-            color: #3d8aa1;
+            color: #562870;
         }
         .top-bar .menu-item {
             margin-left: 20px;
@@ -91,7 +91,7 @@ if (!isset($_SESSION['usuario'])) {
             gap: 25px;
         }
         .dashboard-buttons button {
-            background-color: #98AEFF;
+            background-color: #562870;
             color: white;
             border: none;
             padding: 15px;
@@ -102,7 +102,7 @@ if (!isset($_SESSION['usuario'])) {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7);
         }
         .dashboard-buttons button:hover {
-            background-color:rgb(123, 151, 253);
+            background-color:#6d338f;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7);
             font-size: 1.3em;
         }
@@ -225,7 +225,7 @@ if (!isset($_SESSION['usuario'])) {
         // Gestión Ordenes de Compra
         const handleOrdersAccess = () => {
             if (userRole === 'Administrador' || userRole === 'Comprador' || userRole === 'Supervisor') {
-                window.location.href = "Orders.html";
+                window.location.href = "orders.html";
             } else {
                 window.location.href = "accessdenied.html";
             }
