@@ -916,7 +916,7 @@
         async function viewOrderDetails(orderId) {
             try {
                 document.getElementById('viewOrderModal').style.display = 'block';
-                document.getElementById('viewModalTitle').textContent = `Detalles de Orden #${orderId}`;
+                document.getElementById('viewModalTitle').textContent = `Detalles de Orden N°000${orderId}`;
                 
                 const response = await fetch(`../actions/Orders.php?action=getFullOrder&orderId=${orderId}`);
                 const data = await response.json();
@@ -1007,7 +1007,7 @@
         async function editOrder(orderId) {
             try {
                 showModal(false);
-                document.getElementById('modalTitle').textContent = `Editar Orden #${orderId}`;
+                document.getElementById('modalTitle').textContent = `Editar Orden N°000${orderId}`;
                 document.getElementById('orderId').value = orderId;
                 
                 // Cargar proveedores
