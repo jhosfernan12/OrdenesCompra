@@ -137,7 +137,7 @@ if (!isset($_SESSION['usuario'])) {
             <nav class="sidebar-nav">
                 <a href="#" id="linkSuppliers"><i class="fas fa-truck"></i> Gestión Proveedores</a>
                 <a href="#" id="linkProducts"><i class="fas fa-box"></i> Gestión Productos</a>
-                <a href="#"><i class="fas fa-shopping-cart"></i> Órdenes de Compra</a>
+                <a href="#" id="linkOrders"><i class="fas fa-shopping-cart"></i> Órdenes de Compra</a>
                 <a href=""><i class="fas fa-chart-line"></i> Inventario</a>
                 <a href="#" id="linkUserManagement"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
             </nav>
@@ -154,7 +154,7 @@ if (!isset($_SESSION['usuario'])) {
             <div class="dashboard-buttons">
                 <button id="btnSuppliers">Gestión Proveedores</button>
                 <button id="btnProducts">Gestión Productos</button>
-                <button>Órdenes de Compra</button>
+                <button id="btnOrders">Órdenes de Compra</button>
                 <button>Inventario</button>
                 <button id="btnUserManagement">Gestión Usuarios</button>
             </div>
@@ -220,6 +220,21 @@ if (!isset($_SESSION['usuario'])) {
         document.getElementById("linkSuppliers").addEventListener('click', (e) => {
             e.preventDefault();
             handleSuppliersAccess();
+        });
+
+        // Gestión Ordenes de Compra
+        const handleOrdersAccess = () => {
+            if (userRole === 'Administrador' || userRole === 'Comprador') {
+                window.location.href = "Orders.html";
+            } else {
+                window.location.href = "accessdenied.html";
+            }
+        };
+
+        document.getElementById("btnOrders").addEventListener('click', handleOrdersAccess);
+        document.getElementById("linkOrders").addEventListener('click', (e) => {
+            e.preventDefault();
+            handleOrdersAccess();
         });
 
 
