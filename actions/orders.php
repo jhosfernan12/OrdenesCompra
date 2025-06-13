@@ -49,10 +49,42 @@ switch ($action) {
     case 'getCurrentUser':
         getCurrentUser();
         break;
+    case 'getMonthlyOrders':
+        getMonthlyOrders($conn);
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida']);
         break;
 }
+
+function getMonthlyOrders($conn) {
+    $sql = "SELECT 
+                MONTH(FechaOrden) AS mes, 
+                COUNT(*) AS cantidad
+            FROM OrdenesCompra
+            WHERE YEAR(FechaOrden) = YEAR(CURDATE())
+            GROUP BY mes
+            ORDER BY mes";
+
+    $result = $conn->query($sql);
+
+    $data = array_fill(1, 12, 0); // Inicializar los 12 meses con cero
+
+    while ($row = $result->fetch_assoc()) {
+        $data[intval($row['mes'])] = intval($row['cantidad']);
+    }
+
+    echo json_encode([
+        'success' => true,
+        'labels' => [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ],
+        'data' => array_values($data)
+    ]);
+}
+
 
 function getCurrentUser() {
     session_start();

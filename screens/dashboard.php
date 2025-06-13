@@ -51,7 +51,7 @@ if (!isset($_SESSION['usuario'])) {
             transition: background-color 0.3s ease;
         }
         .sidebar a:hover {
-            background-color:hsla(293, 41.20%, 48.00%, 0.48);
+            background-color:#a148ad;
         }
         .main-content {
             margin-left: 250px;
@@ -62,7 +62,7 @@ if (!isset($_SESSION['usuario'])) {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .top-bar {
-            background-color: rgba(234, 245, 228, 0.9);
+            background-color: rgba(237, 228, 245, 0.9);
             border-radius: 10px;
             padding: 20px;
             display: flex;
@@ -124,16 +124,30 @@ if (!isset($_SESSION['usuario'])) {
             display: inline-block;
         }
         .success {
-            background-color: rgba(230, 249, 236, 0.9);
-            color: #2d6a4f;
-            border: 1px solid #a5d6a7;
+            background-color: rgba(235, 230, 249, 0.9);
+            color:rgb(109, 20, 182);
+            border: 1px solid rgb(180, 165, 214)
         }
+        .chart-container {
+            display: flex;
+            justify-content: center;   /* Centra horizontalmente */
+            align-items: center;       /* Centra verticalmente (si lo necesitás) */
+            flex-direction: column;
+            width: 100%;
+            min-height: 400px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            margin-right: 200px;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Panel de Control</h2>
+            <div class="logo">
+                <img src="../UI/assets/logo.png" alt="Logo" style="width: 115%; max-width: 500px; height: auto;">
+            </div>
             <nav class="sidebar-nav">
                 <a href="#" id="linkSuppliers"><i class="fas fa-truck"></i> Gestión Proveedores</a>
                 <a href="#" id="linkProducts"><i class="fas fa-box"></i> Gestión Productos</a>
@@ -144,6 +158,8 @@ if (!isset($_SESSION['usuario'])) {
         </div>
 
         <div class="main-content">
+           
+
             <div class="top-bar">
                 <h1>Bienvenido, <?php echo htmlspecialchars($_SESSION['usuario']); ?></h1>
                 <div>
@@ -162,13 +178,23 @@ if (!isset($_SESSION['usuario'])) {
             <div id="message" class="message success" style="display: none;">
                 ¡Bienvenido a tu panel de control!
             </div>
+             <div style="margin-top: 10px; max-width: 500px;">
+    <h2 style="color: #562870; margin-bottom: 15px;">Órdenes por mes</h2>
+    
+    <div class="chart-container">
+    <div style="width: 100%; max-width: 800px; height: 400px;">
+        <canvas id="ordersChart"></canvas>
+    </div>
+</div>
+</div>
+
         </div>
     </div>
 
     <div class="footer">
-        <p>&copy; 2025 KAUFFLUSS - Sistema de Gestión de Ordenes de Compra. Todos los derechos reservados</p>
+        <p>&copy; 2025 FLUß - Sistema de Gestión de Ordenes de Compra. Todos los derechos reservados</p>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const userRole = "<?php echo $_SESSION['rol']; ?>";
 
@@ -239,7 +265,7 @@ if (!isset($_SESSION['usuario'])) {
         
         // Gestión Inventario
         const handleInventoryAccess = () => {
-            if (userRole === 'Administrador' || userRole === 'Comprador' || userRole === 'Supervisor') {
+            if (userRole === 'Administrador' || userRole === 'Comprador') {
                 window.location.href = "inventory.html";
             } else {
                 window.location.href = "accessdenied.html";
@@ -252,8 +278,91 @@ if (!isset($_SESSION['usuario'])) {
             handleInventoryAccess();
         });
 
+        const ctx = document.getElementById('ordersChart').getContext('2d');
 
-        
+        const ordersChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [], // ← se llenarán dinámicamente
+                datasets: [{
+                    label: 'Órdenes',
+                    data: [],
+                    backgroundColor: 'rgba(86, 40, 112, 0.54)', // azul suave
+                    borderColor: 'rgb(73, 33, 165)', // borde más oscuro
+                    borderWidth: 2,
+                    borderRadius: 8,  // esquinas redondeadas
+                    barThickness: 30  // barras más delgadas
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#222',
+                        titleColor: '#fff',
+                        bodyColor: '#ddd',
+                        cornerRadius: 6,
+                        padding: 10
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 10,
+                        bottom: 10,
+                        left: 20,
+                        right: 20
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.1)'
+                        },
+                        ticks: {
+                            color: '#666',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#666',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Llama al backend para obtener los datos reales
+        fetch('../actions/orders.php?action=getMonthlyOrders')
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    ordersChart.data.labels = json.labels;
+                    ordersChart.data.datasets[0].data = json.data;
+                    ordersChart.update();
+                } else {
+                    console.error('Error al obtener datos del gráfico:', json.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la petición fetch:', error);
+            });
+
     </script>
 
 

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Gestión de Inventario</title>
+  <style>
+    /* Estilos base */
+    body, html, input, button, select {
+      font-family: 'Poppins', sans-serif;
+      background-color: #e7e7e7;
+      font-weight: 550;
+    }
+    
+    #app {
+      display: flex;
+      max-width: 1400px;
+      margin: 40px auto;
+      min-height: 600px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* Contenido principal */
+    #mainContent {
+      flex: 1;
+      padding: 30px 25px;
+      box-sizing: border-box;
+      transition: flex 0.4s ease;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    h1, h2, h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: #000000;
+    }
+
+    /* Botones */
+    button, input[type="submit"] {
+      background-color: #562870;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    button:hover, input[type="submit"]:hover {
+      background-color: #6d338f;
+      transform: translateY(-2px);
+    }
+
+    /* Formularios */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin: 8px 0 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #562870;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 10px;
+      color: #444;
+    }
+
+    /* Tabla */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+    
+    thead {
+      background-color: #562870da;
+      color: white;
+    }
+    
+    th, td {
+      padding: 12px 10px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f4ff;
+    }
+
+    /* Botones de acción */
+    .editBtn, .deleteBtn {
+      background-color: #dc3545;
+      margin-right: 5px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+    }
+    
+    .delete-btn:hover {
+      background-color: #bd2130;
+    }
+    .editBtn:hover {
+      background-color: #6d338f;
+    }
+    
+    .deleteBtn:hover {
+      background-color: #bd2130;
+    }
+
+    /* Modales */
+    #addInventoryModal, #editInventoryModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 400px;
+      max-width: 90%;
+    }
+
+    #addInventoryModal::backdrop, #editInventoryModal::backdrop {
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    #addInventoryModal {
+    z-index: 9999; 
+
+    }
+
+
+    /* Toasts */
+    #toastContainer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000; /* Mayor que el z-index de los modales */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 320px;
+    }
+
+    .toast {
+      background: #333;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideIn 0.3s ease forwards;
+      font-size: 0.9rem;
+      user-select: none;
+      position: relative;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 0.95; transform: translateX(0); }
+    }
+
+    .toast.success {
+      background-color: #28a745;
+    }
+    
+    .toast.error {
+      background-color: #dc3545;
+    }
+    
+    .toast.info {
+      background-color: #5821bed8;
+    }
+    
+    .toast.warning {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .toast button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 15px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    
+    .toast button:hover {
+      background-color: rgba(255,255,255,0.3);
+    }
+
+    fieldset {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    legend {
+      padding: 0 10px;
+      font-weight: 600;
+      color: #562870;
+    }
+    .toast.confirm {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 20px 10px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .toast.confirm-buttons {
+        align-self: stretch;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .toast.confirm button {
+        background-color: rgba(255,255,255,0.2);
+        color: white;
+        font-weight: 600;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .toast.confirm button.yes {
+        background-color: #28a745;
+    }
+
+    .toast.confirm button.no {
+        background-color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Gestión de Inventario</h1>
+
+<div style="margin-bottom: 15px;">
+  <a href="dashboard.php"><button type="button">← Volver al Dashboard</button></a>
+</div>
+
+<fieldset>
+  <legend>Filtros</legend>
+  <label for="searchProduct">Buscar Producto:</label>
+  <input type="text" id="searchProduct" placeholder="Nombre del producto">
+  <label for="stockFilter">Filtrar por stock:</label>
+  <select id="stockFilter">
+    <option value="all">Todos</option>
+    <option value="low">Stock bajo</option>
+    <option value="critical">Stock crítico</option>
+  </select>
+</fieldset>
+
+<section>
+  <h2>Lista de Inventario</h2>
+  <button id="openAddModal">Añadir Producto</button>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Stock Actual</th>
+        <th>Stock Mínimo</th>
+        <th>Última Actualización</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="inventoryTableBody"></tbody>
+  </table>
+</section>
+
+<!-- Modal Añadir -->
+<dialog id="addInventoryModal">
+  <form id="addInventoryForm" method="dialog">
+    <h4>Añadir Producto al Inventario</h4>
+    <label for="productSelect">Producto:</label>
+    <select id="productSelect" required></select>
+    <label for="currentStock">Stock Actual:</label>
+    <input type="number" id="currentStock" min="0" value="0" required>
+    <label for="minStock">Stock Mínimo:</label>
+    <input type="number" id="minStock" min="0" value="5" required>
+    <div>
+      <button type="submit" id="btnSaveInventory">Guardar</button>
+      <button type="button" id="cancelAdd">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal Editar -->
+<dialog id="editInventoryModal">
+  <form id="editInventoryForm" method="dialog">
+    <h4>Editar Inventario</h4>
+    <input type="hidden" id="editInventoryId">
+    <label>Producto:</label>
+    <p id="editProductName"></p>
+    <label for="editCurrentStock">Stock Actual:</label>
+    <input type="number" id="editCurrentStock" min="0" required>
+    <label for="editMinStock">Stock Mínimo:</label>
+    <input type="number" id="editMinStock" min="0" required>
+    <div>
+      <button type="submit" id="btnUpdateInventory">Actualizar</button>
+      <button type="button" id="cancelEdit">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toastContainer"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Cargar datos iniciales
+    loadInventory();
+    loadProductsForSelect();
+
+    // Abrir modal de añadir
+    $('#openAddModal').click(function() {
+        $('#addInventoryModal')[0].showModal();
+    });
+
+    // Manejar el envío del formulario de añadir
+    $('#addInventoryForm').on('submit', function(e) {
+        e.preventDefault();
+        addInventory();
+    });
+
+    // Manejar el envío del formulario de editar
+    $('#editInventoryForm').on('submit', function(e) {
+        e.preventDefault();
+        updateInventory();
+    });
+
+    // Botón cancelar añadir
+    $('#cancelAdd').click(function() {
+        $('#addInventoryModal')[0].close();
+    });
+
+    // Botón cancelar editar
+    $('#cancelEdit').click(function() {
+        $('#editInventoryModal')[0].close();
+    });
+
+    // Filtros
+    $('#searchProduct, #stockFilter').on('input change', loadInventory);
+});
+
+function loadInventory() {
+    const searchTerm = $('#searchProduct').val().toLowerCase();
+    const stockFilter = $('#stockFilter').val();
+
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'GET',
+        data: {
+            action: 'get_inventory',
+            search: searchTerm,
+            stock: stockFilter
+        },
+        success: function(response) {
+            try {
+                let inventory = typeof response === 'string' ? JSON.parse(response) : response;
+                let html = '';
+                
+                if (Array.isArray(inventory)) {
+                    inventory.forEach(item => {
+                        html += `
+                            <tr data-id="${item.IDInventario}">
+                                <td>${item.IDInventario}</td>
+                                <td>${item.NombreProducto}</td>
+                                <td>${item.StockActual}</td>
+                                <td>${item.StockMinimo}</td>
+                                <td>${item.FechaUltimaActualizacion}</td>
+                                <td><button class="edit-btn" data-id="${item.IDInventario}">Editar</button></td>
+                                <button class="delete-btn" data-id="${item.IDInventario}">Eliminar</button>
+                            </tr>
+                        `;
+                    });
+                }
+                $('#inventoryTableBody').html(html);
+            } catch (e) {
+                console.error("Error parsing inventory data:", e);
+                showToast("Error al procesar los datos del inventario", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error al cargar inventario: " + error, "error");
+        }
+    });
+}
+function loadInventory() {
+    const searchTerm = $('#searchProduct').val().toLowerCase();
+    const stockFilter = $('#stockFilter').val();
+
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'GET',
+        data: {
+            action: 'get_inventory',
+            search: searchTerm,
+            stock: stockFilter
+        },
+        success: function(response) {
+            try {
+                let inventory = typeof response === 'string' ? JSON.parse(response) : response;
+                let html = '';
+                
+                if (Array.isArray(inventory)) {
+                    inventory.forEach(item => {
+                        html += `
+                            <tr data-id="${item.IDInventario}">
+                                <td>${item.IDInventario}</td>
+                                <td>${item.NombreProducto}</td>
+                                <td>${item.StockActual}</td>
+                                <td>${item.StockMinimo}</td>
+                                <td>${item.FechaUltimaActualizacion}</td>
+                                <td>
+                                    <button class="edit-btn" data-id="${item.IDInventario}">Editar</button>
+                                    <button class="delete-btn" data-id="${item.IDInventario}">Eliminar</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                $('#inventoryTableBody').html(html);
+            } catch (e) {
+                console.error("Error parsing inventory data:", e);
+                showToast("Error al procesar los datos del inventario", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error al cargar inventario: " + error, "error");
+        }
+    });
+}
+
+// ... (las otras funciones permanecen iguales hasta la función showToast)
+
+// Manejar clic en botones de editar
+$(document).on('click', '.edit-btn', function() {
+    const id = $(this).data('id');
+    editInventory(id);
+});
+
+// Manejar clic en botones de eliminar
+$(document).on('click', '.delete-btn', function() {
+    const id = $(this).data('id');
+    const productName = $(this).closest('tr').find('td:nth-child(2)').text();
+    
+    showConfirmDialog(
+        `¿Estás seguro que deseas eliminar el producto "${productName}"? Esta acción no se puede deshacer.`,
+        'Eliminar',
+        'Cancelar',
+        function() {
+            deleteInventory(id, productName);
+        },
+        function() {
+            showToast("Eliminación cancelada", "info");
+        }
+    );
+});
+
+function deleteInventory(id, productName) {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'POST',
+        data: {
+            action: 'delete_inventory',
+            IDInventario: id
+        },
+        success: function(response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                if (result.success) {
+                    showToast(`Producto "${productName}" eliminado correctamente`, "success");
+                    loadInventory();
+                } else {
+                    showToast(result.message || "Error al eliminar el producto", "error");
+                }
+            } catch (e) {
+                console.error("Error parsing response:", e);
+                showToast("Error al procesar la respuesta del servidor", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error en la conexión: " + error, "error");
+        },
+        complete: function() {
+            isSubmitting = false;
+        }
+    });
+}
+
+function loadProductsForSelect() {
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'GET',
+        data: { action: 'get_products' },
+        success: function(response) {
+            try {
+                let products = typeof response === 'string' ? JSON.parse(response) : response;
+                let html = '<option value="" disabled selected>Seleccione un producto</option>';
+                
+                if (Array.isArray(products)) {
+                    products.forEach(product => {
+                        html += `<option value="${product.IDProducto}">${product.Nombre}</option>`;
+                    });
+                }
+                $('#productSelect').html(html);
+            } catch (e) {
+                console.error("Error parsing products data:", e);
+                showToast("Error al procesar los datos de productos", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error al cargar productos: " + error, "error");
+        }
+    });
+}
+
+let isSubmitting = false;
+
+function addInventory() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    const idProducto = $('#productSelect').val();
+    const stockActual = parseInt($('#currentStock').val()) || 0;
+    const stockMinimo = parseInt($('#minStock').val()) || 0;
+    const productName = $('#productSelect option:selected').text();
+
+    // Validaciones
+    if (!idProducto) {
+        showToast("Debe seleccionar un producto", "warning");
+        isSubmitting = false;
+        return;
+    }
+
+    if (isNaN(stockActual) || isNaN(stockMinimo) || stockActual < 0 || stockMinimo < 0) {
+        showToast("Los valores de stock deben ser números positivos", "warning");
+        isSubmitting = false;
+        return;
+    }
+
+    $('#btnSaveInventory').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'POST',
+        data: {
+            action: 'add_inventory',
+            IDProducto: idProducto,
+            StockActual: stockActual,
+            StockMinimo: stockMinimo
+        },
+        success: function(response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                
+                if (result.success) {
+                    showToast(result.message || "Inventario añadido correctamente", "success");
+                    $('#addInventoryForm')[0].reset();
+                    $('#addInventoryModal')[0].close();
+                    loadInventory();
+                } 
+                else if (result.existing) {
+                    showConfirmDialog(
+                        result.message,
+                        'Actualizar',
+                        'Cancelar',
+                        function() {
+                            updateExistingInventory(idProducto, stockActual, stockMinimo, productName);
+                        },
+                        function() {
+                            showToast("Operación cancelada", "info");
+                            $('#addInventoryModal')[0].showModal();
+                        }
+                    );
+                }
+                else {
+                    showToast(result.message || "Error al añadir inventario", "error");
+                    $('#addInventoryModal')[0].showModal();
+                }
+            } catch (e) {
+                console.error("Error parsing response:", e, "Response:", response);
+                showToast("Error al procesar la respuesta del servidor", "error");
+                $('#addInventoryModal')[0].showModal();
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error en la conexión: " + error, "error");
+            console.error("AJAX Error:", xhr.responseText);
+            $('#addInventoryModal')[0].showModal();
+        },
+        complete: function() {
+            isSubmitting = false;
+            $('#btnSaveInventory').prop('disabled', false).text('Guardar');
+            $('#addInventoryModal')[0].close();
+        }
+    });
+}
+
+function editInventory(id) {
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'GET',
+        data: { action: 'get_inventory_item', id: id },
+        success: function(response) {
+            try {
+                const item = typeof response === 'string' ? JSON.parse(response) : response;
+                $('#editInventoryId').val(item.IDInventario);
+                $('#editProductName').text(item.NombreProducto);
+                $('#editCurrentStock').val(item.StockActual);
+                $('#editMinStock').val(item.StockMinimo);
+                $('#editInventoryModal')[0].showModal();
+            } catch (e) {
+                console.error("Error parsing inventory item:", e);
+                showToast("Error al procesar los datos del producto", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error al cargar datos: " + error, "error");
+        }
+    });
+}
+
+function updateInventory() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    const id = $('#editInventoryId').val();
+    const stockActual = parseInt($('#editCurrentStock').val()) || 0;
+    const stockMinimo = parseInt($('#editMinStock').val()) || 0;
+
+    // Validaciones
+    if (isNaN(stockActual) || isNaN(stockMinimo) || stockActual < 0 || stockMinimo < 0) {
+        showToast("Los valores de stock deben ser números positivos", "warning");
+        isSubmitting = false;
+        return;
+    }
+
+    $('#btnUpdateInventory').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Actualizando...');
+
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'POST',
+        data: {
+            action: 'update_inventory',
+            IDInventario: id,
+            StockActual: stockActual,
+            StockMinimo: stockMinimo
+        },
+        success: function(response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                if (result && result.success) {
+                    showToast("Inventario actualizado correctamente", "success");
+                    $('#editInventoryModal')[0].close();
+                    loadInventory();
+                } else {
+                    showToast(result.message || "Error al actualizar el inventario", "error");
+                }
+            } catch (e) {
+                console.error("Error parsing response:", e);
+                showToast("Error al procesar la respuesta del servidor", "error");
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error en la conexión: " + error, "error");
+        },
+        complete: function() {
+            isSubmitting = false;
+            $('#btnUpdateInventory').prop('disabled', false).text('Actualizar');
+        }
+    });
+}
+
+function updateExistingInventory(productId, additionalStock, minStock, productName) {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    $.ajax({
+        url: '../actions/inventory.php',
+        type: 'POST',
+        data: {
+            action: 'update_inventory_existing',
+            IDProducto: productId,
+            StockActual: additionalStock,
+            StockMinimo: minStock
+        },
+        success: function(response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                if (result.success) {
+                    showToast(`Stock de "${productName}" actualizado correctamente`, "success");
+                    $('#addInventoryForm')[0].reset();
+                    $('#addInventoryModal')[0].close();
+                    loadInventory();
+                } else {
+                    showToast(result.message || "Error al actualizar el inventario", "error");
+                    $('#addInventoryModal')[0].showModal();
+                }
+            } catch (e) {
+                console.error("Error parsing response:", e);
+                showToast("Error al procesar la respuesta del servidor", "error");
+                $('#addInventoryModal')[0].showModal();
+            }
+        },
+        error: function(xhr, status, error) {
+            showToast("Error al actualizar: " + error, "error");
+            $('#addInventoryModal')[0].showModal();
+        },
+        complete: function() {
+            isSubmitting = false;
+        }
+    });
+}
+
+function showConfirmDialog(message, confirmText, cancelText, confirmCallback, cancelCallback) {
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        console.error("No se encontró el contenedor de toasts");
+        return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast confirm';
+    toast.innerHTML = `
+        <span>${message}</span>
+        <div class="confirm-buttons">
+            <button class="yes">${confirmText}</button>
+            <button class="no">${cancelText}</button>
+        </div>
+    `;
+
+    // Agregar eventos a los botones
+    toast.querySelector('.yes').onclick = function() {
+        toast.remove();
+        confirmCallback();
+    };
+    
+    toast.querySelector('.no').onclick = function() {
+        toast.remove();
+        cancelCallback();
+    };
+
+    container.appendChild(toast);
+}
+
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        console.error("No se encontró el contenedor de toasts");
+        return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(toast);
+    setTimeout(() => {
+        if (toast.parentNode === container) {
+            toast.remove();
+        }
+    }, duration);
+}
+
+// Manejar clic en botones de editar
+$(document).on('click', '.edit-btn', function() {
+    const id = $(this).data('id');
+    editInventory(id);
+});
+</script>
+</body>
+</html>
