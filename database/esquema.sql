@@ -1,7 +1,4 @@
--- Esquema de la base de datos
-
 CREATE DATABASE IF NOT EXISTS OrdenesCompra;
-
 USE OrdenesCompra;
 
 -- Tabla de Usuarios
@@ -14,9 +11,9 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     token VARCHAR(255) DEFAULT NULL
 );
 
--- Tabla de Proveedores
+-- Tabla de Proveedores con RUC como PRIMARY KEY
 CREATE TABLE IF NOT EXISTS Proveedores (
-    IDProveedor INT AUTO_INCREMENT PRIMARY KEY,
+    RUC VARCHAR(20) PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
     Direccion VARCHAR(200) NOT NULL,
     Telefono VARCHAR(20) NOT NULL,
@@ -31,11 +28,11 @@ CREATE TABLE IF NOT EXISTS Productos (
     Descripcion TEXT NOT NULL,
     Precio DECIMAL(10,2) NOT NULL,
     Moneda ENUM('PEN', 'USD') NOT NULL DEFAULT 'PEN',
-    IDProveedor INT,
-    FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor)
+    RUC VARCHAR(20),
+    FOREIGN KEY (RUC) REFERENCES Proveedores(RUC)
 );
 
-
+-- Tabla de Inventario
 CREATE TABLE IF NOT EXISTS Inventario (
     IDInventario INT AUTO_INCREMENT PRIMARY KEY,
     IDProducto INT NOT NULL,
@@ -45,18 +42,40 @@ CREATE TABLE IF NOT EXISTS Inventario (
     FOREIGN KEY (IDProducto) REFERENCES Productos(IDProducto)
 );
 
+-- Tabla de OrdenesCompra
+CREATE TABLE IF NOT EXISTS OrdenesCompra (
+    IDOrden INT AUTO_INCREMENT PRIMARY KEY,
+    FechaOrden DATE NOT NULL,
+    Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
+    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN',
+    RUC VARCHAR(20),
+    IDUsuario INT,
+    FOREIGN KEY (RUC) REFERENCES Proveedores(RUC),
+    FOREIGN KEY (IDUsuario) REFERENCES Usuarios(IDUsuario)
+);
+
+CREATE TABLE IF NOT EXISTS InfoEmpresa (
+    RUC VARCHAR(20) PRIMARY KEY,
+    Nombre VARCHAR(150) NOT NULL,
+    Correo VARCHAR(100) NOT NULL,
+    Direccion VARCHAR(200) NOT NULL,
+    Celular VARCHAR(20) NOT NULL
+);
 
 -- Tabla de OrdenesCompra
 CREATE TABLE IF NOT EXISTS OrdenesCompra (
     IDOrden INT AUTO_INCREMENT PRIMARY KEY,
     FechaOrden DATE NOT NULL,
     Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
-    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN', 
-    IDProveedor INT,
+    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN',
+    RUCProveedor VARCHAR(20),
+    RUCMiEmpresa VARCHAR(20) NOT NULL,
     IDUsuario INT,
-    FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor),
+    FOREIGN KEY (RUCProveedor) REFERENCES Proveedores(RUC),
+    FOREIGN KEY (RUCMiEmpresa) REFERENCES InfoEmpresa(RUC),
     FOREIGN KEY (IDUsuario) REFERENCES Usuarios(IDUsuario)
 );
+
 
 -- Tabla de DetallesOrdenesCompra
 CREATE TABLE IF NOT EXISTS DetallesOrdenesCompra (
@@ -68,3 +87,5 @@ CREATE TABLE IF NOT EXISTS DetallesOrdenesCompra (
     FOREIGN KEY (IDOrden) REFERENCES OrdenesCompra(IDOrden),
     FOREIGN KEY (IDProducto) REFERENCES Productos(IDProducto)
 );
+
+

@@ -28,57 +28,104 @@ if ($action === 'list') {
     exit;
 
 } elseif ($action === 'get') {
-    $id = $_GET['id'] ?? 0;
-    $stmt = $conn->prepare("SELECT * FROM Proveedores WHERE IDProveedor = ?");
-    $stmt->bind_param("i", $id);
+    $ruc = $_GET['ruc'] ?? 0;
+    $stmt = $conn->prepare("SELECT * FROM Proveedores WHERE RUC = ?");
+    $stmt->bind_param("s", $ruc);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
     exit;
 
 } elseif ($action === 'update') {
-    $id = $_POST['IDProveedor'] ?? null;
+    $originalRUC = $_POST['originalRUC'] ?? null; // RUC actual en la base
+    $newRUC = $_POST['RUC'] ?? null; // Nuevo RUC que puede reemplazar al original
     $nombre = $_POST['Nombre'] ?? '';
     $direccion = $_POST['Direccion'] ?? '';
     $telefono = $_POST['Telefono'] ?? '';
     $correo = $_POST['Correo'] ?? '';
 
-    if (!$id) {
-        echo json_encode(["error" => "ID faltante"]);
+    if (!$originalRUC || !$newRUC) {
+        echo json_encode(["status" => "Error", "message" => "RUC faltante"]);
         exit;
     }
 
-    $stmt = $conn->prepare("UPDATE Proveedores SET Nombre=?, Direccion=?, Telefono=?, Correo=? WHERE IDProveedor=?");
-    $stmt->bind_param("ssssi", $nombre, $direccion, $telefono, $correo, $id);
+    $stmt = $conn->prepare("UPDATE Proveedores SET RUC=?, Nombre=?, Direccion=?, Telefono=?, Correo=? WHERE RUC=?");
+    $stmt->bind_param("ssssss", $newRUC, $nombre, $direccion, $telefono, $correo, $originalRUC);
     $success = $stmt->execute();
-    echo json_encode(["status" => $success ? "OK" : "Error"]);
-    exit;
 
-} elseif ($action === 'add') {
-    $nombre = $_POST['Nombre'] ?? '';
-    $direccion = $_POST['Direccion'] ?? '';
-    $telefono = $_POST['Telefono'] ?? '';
-    $correo = $_POST['Correo'] ?? '';
-
-    $stmt = $conn->prepare("INSERT INTO Proveedores (Nombre, Direccion, Telefono, Correo, FechaRegistro) VALUES (?, ?, ?, ?, NOW())");
-    $stmt->bind_param("ssss", $nombre, $direccion, $telefono, $correo);
-    $success = $stmt->execute();
-    echo json_encode(["status" => $success ? "OK" : "Error"]);
-    exit;
-
-} elseif ($action === 'delete') {
-    $id = $_POST['IDProveedor'] ?? null;
-    if (!$id) {
-        echo json_encode(["error" => "ID faltante"]);
-        exit;
-    }
-
-    $stmt = $conn->prepare("DELETE FROM Proveedores WHERE IDProveedor = ?");
-    $stmt->bind_param("i", $id);
-    $success = $stmt->execute();
-    echo json_encode(["status" => $success ? "OK" : "Error"]);
+    echo json_encode(["status" => $success ? "OK" : "Error", "message" => $stmt->error]);
     exit;
 }
+
+ elseif ($action === 'add') {
+    $ruc = $_POST['RUC'] ?? '';
+    $nombre = $_POST['Nombre'] ?? '';
+    $direccion = $_POST['Direccion'] ?? '';
+    $telefono = $_POST['Telefono'] ?? '';
+    $correo = $_POST['Correo'] ?? '';
+
+    if (empty($ruc)) {
+        echo json_encode(["error" => "RUC faltante"]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO Proveedores (RUC, Nombre, Direccion, Telefono, Correo, FechaRegistro) VALUES (?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("sssss", $ruc, $nombre, $direccion, $telefono, $correo);
+    $success = $stmt->execute();
+
+if (!$success) {
+    echo json_encode([
+        "status" => "Error",
+        "message" => $stmt->error  // Aquí verás qué falló
+    ]);
+} else {
+    echo json_encode(["status" => "OK"]);
+}
+exit;
+
+}
+
+elseif ($action === 'delete') {
+    $ruc = $_POST['RUC'] ?? null;
+    if (!$ruc) {
+        echo json_encode(["status" => "Error", "message" => "RUC faltante"]);
+        exit;
+    }
+
+    // Verificar si tiene productos asociados
+    $stmtCheckProducts = $conn->prepare("SELECT COUNT(*) as count FROM productos WHERE RUC = ?");
+    $stmtCheckProducts->bind_param("s", $ruc);
+    $stmtCheckProducts->execute();
+    $resultProducts = $stmtCheckProducts->get_result()->fetch_assoc();
+
+    if ($resultProducts['count'] > 0) {
+        echo json_encode(["status" => "Error", "message" => "No se puede eliminar: el proveedor tiene productos asociados"]);
+        exit;
+    }
+
+    // Verificar si tiene órdenes de compra asociadas
+    $stmtCheckOrders = $conn->prepare("SELECT COUNT(*) as count FROM ordenescompra WHERE RUCProveedor = ?");
+    $stmtCheckOrders->bind_param("s", $ruc);
+    $stmtCheckOrders->execute();
+    $resultOrders = $stmtCheckOrders->get_result()->fetch_assoc();
+
+    if ($resultOrders['count'] > 0) {
+        echo json_encode(["status" => "Error", "message" => "No se puede eliminar: el proveedor tiene órdenes de compra asociadas"]);
+        exit;
+    }
+
+    // Si no hay dependencias, eliminar
+    $stmt = $conn->prepare("DELETE FROM Proveedores WHERE RUC = ?");
+    $stmt->bind_param("s", $ruc);
+    $success = $stmt->execute();
+
+    echo json_encode([
+        "status" => $success ? "OK" : "Error",
+        "message" => $success ? "Proveedor eliminado correctamente" : $stmt->error
+    ]);
+    exit;
+}
+
 
 echo json_encode(["error" => "Acción no válida"]);
 $conn->close();

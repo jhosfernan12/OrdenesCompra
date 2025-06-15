@@ -16,7 +16,6 @@
             display: flex;
             max-width: 1400px;
             margin: 40px auto;
-            min-height: 600px;
             box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
             border-radius: 10px;
             overflow: hidden;
@@ -31,6 +30,7 @@
             transition: flex 0.4s ease;
             overflow-y: auto;
             position: relative;
+            background: #fff;
         }
         
         #mainContent.shifted {
@@ -316,6 +316,12 @@
             outline: none;
             box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
         }
+
+        #editRUC, label[for="editRUC"] {
+            display: block;
+            visibility: visible;
+        }
+
     </style>
 </head>
 <body>
@@ -334,7 +340,7 @@
             <table id="supplierTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>RUC</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Correo</th>
@@ -355,10 +361,15 @@
         <div id="supplierForm">
             <h3 id="formTitle">Editar Proveedor</h3>
             <form id="editForm" onsubmit="event.preventDefault(); submitForm();">
-                <input type="hidden" id="editID">
+
                 <label for="editNombre">Nombre:</label>
                 <input type="text" id="editNombre" required>
-                
+
+                <input type="hidden" id="originalRUC" name="originalRUC">
+
+                <label for="editRUC">RUC:</label>
+                <input type="text" id="editRUC" pattern="\d{11}" title="11 dígitos" maxlength="11" required>
+
                 <label for="editDireccion">Dirección:</label>
                 <input type="text" id="editDireccion" required>
                 
@@ -388,6 +399,7 @@
         const supplierTable = document.querySelector('#supplierTable tbody');
         const dashboardBtn = document.getElementById('dashboardBtn');
         const toastContainer = document.getElementById('toastContainer');
+        
 
         function showToast(message, type = 'info', duration = 4000) {
             const toast = document.createElement('div');
@@ -462,33 +474,37 @@
             suppliers.forEach(supplier => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${supplier.IDProveedor}</td>
+                    <td>${supplier.RUC}</td> 
                     <td>${supplier.Nombre}</td>
                     <td><a href="tel:${supplier.Telefono}">${supplier.Telefono}</a></td>
                     <td><a href="mailto:${supplier.Correo}">${supplier.Correo}</a></td>
                     <td>${supplier.Direccion}</td>
                     <td>${supplier.FechaRegistro}</td>
                     <td>
-                        <button class="editBtn" onclick="editSupplier(${supplier.IDProveedor})">Editar</button>
-                        <button class="deleteBtn" onclick="deleteSupplier(${supplier.IDProveedor})">Eliminar</button>
+                        <button class="editBtn" onclick="editSupplier(${supplier.RUC})">Editar</button>
+                        <button class="deleteBtn" onclick="deleteSupplier(${supplier.RUC})">Eliminar</button>
                     </td>
                 `;
                 supplierTable.appendChild(row);
             });
         }
 
-        async function editSupplier(id) {
+        async function editSupplier(ruc) {
             try {
                 isAdding = false;
-                const response = await fetch(`../actions/suppliers.php?action=get&id=${id}`);
+                const response = await fetch(`../actions/suppliers.php?action=get&ruc=${ruc}`);
                 const supplier = await response.json();
 
                 document.getElementById('formTitle').textContent = "Editar Proveedor";
-                document.getElementById('editID').value = supplier.IDProveedor;
+                document.getElementById('editRUC').value = supplier.RUC;
                 document.getElementById('editNombre').value = supplier.Nombre;
                 document.getElementById('editDireccion').value = supplier.Direccion;
                 document.getElementById('editTelefono').value = supplier.Telefono;
                 document.getElementById('editCorreo').value = supplier.Correo;
+                document.getElementById('originalRUC').value = supplier.RUC;
+
+
+
 
                 showForm();
             } catch (error) {
@@ -500,11 +516,13 @@
         function showAddForm() {
             isAdding = true;
             document.getElementById('formTitle').textContent = "Añadir Proveedor";
-            document.getElementById('editID').value = '';
+            document.getElementById('editRUC').value = '';
             document.getElementById('editNombre').value = '';
             document.getElementById('editDireccion').value = '';
             document.getElementById('editTelefono').value = '';
             document.getElementById('editCorreo').value = '';
+
+
             showForm();
         }
 
@@ -519,11 +537,13 @@
         }
 
         async function submitForm() {
-            const id = document.getElementById('editID').value;
+            const id = document.getElementById('editRUC').value;
             const nombre = document.getElementById('editNombre').value.trim();
             const direccion = document.getElementById('editDireccion').value.trim();
             const telefono = document.getElementById('editTelefono').value.trim();
             const correo = document.getElementById('editCorreo').value.trim();
+            const originalRUC = document.getElementById('originalRUC').value;
+
 
             if (!nombre || !direccion || !telefono || !correo) {
                 showToast('Todos los campos son obligatorios', 'warning');
@@ -539,19 +559,27 @@
                 showToast('Ingrese un correo válido', 'warning');
                 return;
             }
+            const ruc = document.getElementById('editRUC').value.trim();
 
+
+            
             const formData = new FormData();
             formData.append("Nombre", nombre);
             formData.append("Direccion", direccion);
             formData.append("Telefono", telefono);
             formData.append("Correo", correo);
+            formData.append("RUC", ruc);
 
+            if (!isAdding) {
+                formData.append("originalRUC", originalRUC);
+            }
             try {
                 let url, action;
 
                 if (isAdding) {
                     url = '../actions/suppliers.php?action=add';
                     action = 'añadido';
+                    
                 } else {
                     url = '../actions/suppliers.php?action=update';
                     formData.append("IDProveedor", id);
@@ -569,22 +597,25 @@
                     showToast(`Proveedor ${action} correctamente`, 'success');
                     closeEdit();
                     loadSuppliers();
-                } else {
-                    showToast(`Error al ${isAdding ? 'añadir' : 'actualizar'} proveedor`, 'error');
-                }
+            } else {
+                const errorMsg = result.message || `Error al ${isAdding ? 'añadir' : 'actualizar'} proveedor`;
+                showToast(errorMsg, 'error');
+                console.error("Error del servidor:", result);
+            }
+
             } catch (error) {
                 showToast('Error de conexión', 'error');
                 console.error(error);
             }
         }
 
-        async function deleteSupplier(id) {
+        async function deleteSupplier(ruc) {
             const confirmed = await showConfirm("¿Está seguro de eliminar este proveedor?");
             if (!confirmed) return;
 
             try {
                 const formData = new FormData();
-                formData.append("IDProveedor", id);
+                formData.append("RUC", ruc);
 
                 const response = await fetch('../actions/suppliers.php?action=delete', {
                     method: 'POST',
@@ -593,12 +624,17 @@
 
                 const result = await response.json();
 
-                if (result.status === "OK") {
-                    showToast('Proveedor eliminado', 'success');
-                    loadSuppliers();
-                } else {
-                    showToast('Error al eliminar proveedor', 'error');
-                }
+            if (result.status === "OK") {
+                showToast(`Proveedor eliminado correctamente`, 'success');
+                closeEdit();
+                loadSuppliers();
+            }
+            else {
+                const errorMsg = result.message || `Error al ${isAdding ? 'añadir' : 'actualizar'} proveedor`;
+                showToast(errorMsg, 'error');
+                console.error("Error del servidor:", result);
+            }
+
             } catch (error) {
                 showToast('Error de conexión', 'error');
                 console.error(error);

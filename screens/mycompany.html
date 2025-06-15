@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi Empresa - Configuración</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base */
+       body, html, input, button, select {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #e7e7e7;
+            font-weight: 550;
+        }
+        
+        #app {
+          display: flex;
+          max-width: 900px;
+          margin: 40px auto;
+          min-height: 100px;
+          box-shadow: 0 px 10px rgb(0 0 0 / 0.15);
+          border-radius: 10px;
+          overflow: hidden;
+          background: #fff;
+        }
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Encabezado */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        /* Botones principales */
+        .btn {
+            background-color: #562870;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: #6d338f;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+        
+        .btn-secondary {
+            background-color: #562870;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6d338f;
+        }
+        
+        /* Barra de búsqueda */
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+            border-radius: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #562870;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+        
+        /* Tabla de órdenes */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .orders-table thead {
+            background-color: #562870da;
+            color: white;
+        }
+        
+        .orders-table th, 
+        .orders-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .orders-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        /* Formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #562870;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(152, 174, 255, 0.2);
+        }
+        
+        /* Productos seleccionados */
+        .selected-products {
+            margin: 20px 0;
+        }
+        
+        .selected-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .selected-products-table th,
+        .selected-products-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        
+        .selected-products-table th {
+            background-color: #f8f9fa;
+        }
+        
+        /* Modal de vista */
+        .view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .view-modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .view-modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .view-modal-title {
+            margin: 0;
+            color: #333;
+        }
+        
+        .order-info {
+            margin-bottom: 30px;
+        }
+        
+        .order-info-section {
+            margin-bottom: 20px;
+        }
+        
+        .order-info-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .order-info-content {
+            padding-left: 20px;
+        }
+        
+        /* Toasts */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 320px;
+        }
+        
+        .toast {
+            background: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+            font-size: 0.9rem;
+            user-select: none;
+            position: relative;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 0.95; transform: translateX(0); }
+        }
+        
+        .toast.success {
+            background-color: #28a745;
+        }
+        
+        .toast.error {
+            background-color: #dc3545;
+        }
+        
+        .toast.info {
+            background-color: #5821bed8;
+        }
+        
+        .toast.warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+        
+        .toast button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 15px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .toast button:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .modal-content,
+            .view-modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* Efectos de carga */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>    
+</head>
+<body>
+    <div id="app">
+    <!-- Contenedor para notificaciones -->
+    <div id="toastContainer"></div>
+
+    <div class="container">
+      <!-- Encabezado con título y botón de regreso -->
+      <div class="header">
+        <h1>Datos de la Empresa</h1>
+        <button class="btn btn-secondary" onclick="window.location.href='dashboard.php'">
+          ← Volver al Dashboard
+        </button>
+      </div>
+
+      <!-- Tabla de datos de la empresa -->
+      <div id="companyTable" style="margin-top: 40px;"></div>
+
+      <!-- Botón para editar datos -->
+      <button id="editBtn" class="btn" type="button" style="margin-bottom: 20px;">
+        Editar Empresa
+      </button>
+
+      <!-- Formulario para editar/guardar los datos de la empresa -->
+      <form id="companyForm" style="display: none;">
+        <!-- RUC -->
+        <div class="form-group">
+          <label class="form-label" for="ruc">RUC (11 dígitos):</label>
+          <input class="form-control" type="text" id="ruc" name="ruc" required pattern="\d{11}" maxlength="11">
+        </div>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label class="form-label" for="nombre">Nombre:</label>
+          <input class="form-control" type="text" id="nombre" name="nombre" required>
+        </div>
+
+        <!-- Correo -->
+        <div class="form-group">
+          <label class="form-label" for="correo">Correo:</label>
+          <input class="form-control" type="email" id="correo" name="correo" required>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label class="form-label" for="direccion">Dirección:</label>
+          <input class="form-control" type="text" id="direccion" name="direccion" required>
+        </div>
+
+        <!-- Celular -->
+        <div class="form-group">
+          <label class="form-label" for="celular">Celular:</label>
+          <input class="form-control" type="text" id="celular" name="celular" required pattern="\d{9}" maxlength="9">
+        </div>
+
+        <!-- Botón de guardado y mensaje -->
+        <button type="submit" class="btn">Guardar Empresa</button>
+        <div id="message" style="margin-top: 10px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  // Cargar datos de la empresa al iniciar
+  function loadCompany() {
+    fetch('../actions/mycompany.php?action=get')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.empresa) {
+          const empresa = data.empresa;
+          for (let campo in empresa) {
+            if (document.getElementById(campo)) {
+              document.getElementById(campo).value = empresa[campo];
+            }
+          }
+
+          const table = `
+            <h3>Empresa Registrada</h3>
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>RUC</th>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Dirección</th>
+                  <th>Celular</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${empresa.RUC}</td>
+                  <td>${empresa.Nombre}</td>
+                  <td>${empresa.Correo}</td>
+                  <td>${empresa.Direccion}</td>
+                  <td>${empresa.Celular}</td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+          document.getElementById('companyTable').innerHTML = table;
+        }
+      });
+  }
+
+  loadCompany();
+
+  // Mostrar/ocultar el formulario con el botón "Editar Empresa"
+  const editBtn = document.getElementById('editBtn');
+  const companyForm = document.getElementById('companyForm');
+
+  editBtn.addEventListener('click', () => {
+    const visible = companyForm.style.display === 'block';
+    companyForm.style.display = visible ? 'none' : 'block';
+    editBtn.textContent = visible ? 'Editar Empresa' : 'Cancelar Edición';
+    if (!visible) {
+      window.scrollTo({ top: companyForm.offsetTop - 50, behavior: 'smooth' });
+    }
+  });
+
+  // Función para mostrar un toast
+  function showToast(message, type = 'success') {
+  let container = document.getElementById('toastContainer');
+
+  // Si no existe el contenedor, lo creamos
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = () => toast.remove();
+
+  toast.appendChild(closeBtn);
+  container.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 4000);
+}
+
+  // Enviar formulario
+  companyForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    fetch('../actions/mycompany.php?action=save', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast('Datos guardados correctamente.', 'success');
+        loadCompany();
+        companyForm.style.display = 'none';
+        editBtn.textContent = 'Editar Empresa';
+      } else {
+        showToast(data.message || 'Error al guardar.', 'error');
+      }
+    });
+  });
+</script>
+</body>
+</html>
+

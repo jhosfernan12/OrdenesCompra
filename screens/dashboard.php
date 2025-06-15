@@ -154,6 +154,7 @@ if (!isset($_SESSION['usuario'])) {
                 <a href="#" id="linkOrders"><i class="fas fa-shopping-cart"></i> Órdenes de Compra</a>
                 <a href="#" id="linkInventory"><i class="fas fa-chart-line"></i> Inventario</a>
                 <a href="#" id="linkUserManagement"><i class="fas fa-users-cog"></i> Gestión Usuarios</a>
+                <a href="#" id="linkMyCompany"><i class="fas fa-users-cog"></i> Mi Empresa</a>
             </nav>
         </div>
 
@@ -168,11 +169,12 @@ if (!isset($_SESSION['usuario'])) {
             </div>
 
             <div class="dashboard-buttons">
-                <button id="btnSuppliers">Gestión Proveedores</button>
+                <button id="btnSuppliers"> Gestión Proveedores</button>
                 <button id="btnProducts">Gestión Productos</button>
                 <button id="btnOrders">Órdenes de Compra</button>
                 <button id="btnInventory">Inventario</button>
                 <button id="btnUserManagement">Gestión Usuarios</button>
+                <button id="btnMyCompany">Mi Empresa</button>
             </div>
 
             <div id="message" class="message success" style="display: none;">
@@ -277,6 +279,22 @@ if (!isset($_SESSION['usuario'])) {
             e.preventDefault();
             handleInventoryAccess();
         });
+
+        const handleMyCompany = () => {
+            if (userRole === 'Administrador') {
+                window.location.href = "mycompany.html";
+            } else {
+                window.location.href = "accessdenied.html";
+            }
+        };
+
+        document.getElementById("btnMyCompany").addEventListener('click', handleMyCompany);
+        document.getElementById("linkMyCompany").addEventListener('click', (e) => {
+            e.preventDefault();
+            handleMyCompany();
+        });
+
+
 
         const ctx = document.getElementById('ordersChart').getContext('2d');
 

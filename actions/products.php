@@ -19,10 +19,10 @@ try {
     if ($action === 'list') {
         $stmt = $pdo->query("
             SELECT P.IDProducto AS id, P.Nombre AS name, P.Descripcion AS description,
-                   P.Precio AS price, P.Moneda AS currency, P.IDProveedor AS provider_id,
+                   P.Precio AS price, P.Moneda AS currency, P.RUC AS provider_id,
                    PR.Nombre AS provider_name
             FROM productos P
-            JOIN proveedores PR ON P.IDProveedor = PR.IDProveedor
+            JOIN proveedores PR ON P.RUC = PR.RUC
         ");
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['status' => 'ok', 'products' => $products]);
@@ -30,7 +30,7 @@ try {
     }
 
     if ($action === 'providers') {
-        $stmt = $pdo->query("SELECT IDProveedor AS id, Nombre AS name FROM proveedores");
+        $stmt = $pdo->query("SELECT RUC AS id, Nombre AS name FROM proveedores");
         $providers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['status' => 'ok', 'providers' => $providers]);
         exit;
@@ -50,7 +50,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO productos (Nombre, Descripcion, Precio, Moneda, IDProveedor) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO productos (Nombre, Descripcion, Precio, Moneda, RUC) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$name, $description, $price, $currency, $provider_id]);
 
         echo json_encode(['status' => 'ok', 'message' => 'Producto creado correctamente']);
@@ -70,7 +70,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("UPDATE productos SET Nombre = ?, Descripcion = ?, Precio = ?, Moneda = ?, IDProveedor = ? WHERE IDProducto = ?");
+        $stmt = $pdo->prepare("UPDATE productos SET Nombre = ?, Descripcion = ?, Precio = ?, Moneda = ?, RUC = ? WHERE IDProducto = ?");
         $stmt->execute([$name, $description, $price, $currency, $provider_id, $id]);
 
         echo json_encode(['status' => 'ok', 'message' => 'Producto actualizado correctamente']);
@@ -85,12 +85,22 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("DELETE FROM productos WHERE IDProducto = ?");
-        $stmt->execute([$id]);
+        try {
+            $stmt = $pdo->prepare("DELETE FROM productos WHERE IDProducto = ?");
+            $stmt->execute([$id]);
 
-        echo json_encode(['status' => 'ok', 'message' => 'Producto eliminado correctamente']);
-        exit;
+            echo json_encode(['status' => 'ok', 'message' => 'Producto eliminado correctamente']);
+            exit;
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                echo json_encode(['status' => 'error', 'message' => 'No se puede eliminar el producto porque está en uso en el inventario y/o en órdenes de compra']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Error DB: ' . $e->getMessage()]);
+            }
+            exit;
+        }
     }
+
 
     echo json_encode(['status' => 'error', 'message' => 'Acción no válida']);
 } catch (PDOException $e) {

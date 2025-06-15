@@ -14,6 +14,16 @@
             background-color: #e7e7e7;
             font-weight: 550;
         }
+
+        #app {
+            display: flex;
+            max-width: 950px;
+            margin: 40px auto;
+            box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
         
         /* Contenedor principal */
         .container {
@@ -30,6 +40,7 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 1px solid #e0e0e0;
+
         }
         
         .header h1 {
@@ -381,6 +392,7 @@
         }
     </style>
 </head>
+    <div id="app">
 <body>
     <div class="container">
         <div class="header">
@@ -426,6 +438,8 @@
             
             <form id="orderForm">
                 <input type="hidden" id="orderId">
+                <input type="hidden" id="rucMiEmpresa" value="12345678901" />
+
                 
                 <div class="form-group">
                     <label for="providerSelect" class="form-label">Proveedor:</label>
@@ -481,7 +495,7 @@
             </form>
         </div>
     </div>
-    
+    </div>
     <!-- Modal para visualizar orden -->
     <div id="viewOrderModal" class="view-modal">
         <div class="view-modal-content">
@@ -682,39 +696,43 @@
         
         // Función para cargar proveedores
         async function loadProviders() {
-            try {
-                const response = await fetch('../actions/Orders.php?action=getProviders');
-                const data = await response.json();
-                
-                if (!data || data.error) {
-                    throw new Error(data?.message || 'Error al cargar proveedores');
-                }
-                
-                const select = document.getElementById('providerSelect');
-                select.innerHTML = '<option value="">Seleccione un proveedor</option>';
-                
-                data.forEach(provider => {
-                    const option = document.createElement('option');
-                    option.value = provider.IDProveedor;
-                    option.textContent = provider.Nombre;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                showToast('Error al cargar proveedores: ' + error.message, 'error');
-                console.error('Error:', error);
-            }
-        }
+    try {
+        const providerSelect = document.getElementById('providerSelect');
+        providerSelect.innerHTML = '<option value="">Cargando proveedores...</option>';
+        providerSelect.disabled = true;
+
+        const response = await fetch('../actions/suppliers.php?action=list');
+        const data = await response.json();
+
+        providerSelect.innerHTML = '<option value="">Seleccione un proveedor</option>';
+        
+        data.forEach(provider => {
+            const option = document.createElement('option');
+            option.value = provider.RUC;
+            option.textContent = `${provider.Nombre} (${provider.RUC})`;
+            providerSelect.appendChild(option);
+        });
+        
+        providerSelect.disabled = false;
+        return data; // Retornamos los datos para usarlos después
+    } catch (error) {
+        console.error('Error cargando proveedores:', error);
+        showToast('Error al cargar proveedores', 'error');
+        return [];
+    }
+}
+
         
         // Función para cargar productos de un proveedor
-        async function loadProducts(providerId) {
-            if (!providerId) {
+        async function loadProducts(ruc) {
+            if (!ruc) {
                 document.getElementById('productSelect').disabled = true;
                 document.getElementById('productQuantity').disabled = true;
                 return;
             }
 
             const currentProvider = document.getElementById('providerSelect').dataset.currentProvider;
-            if (currentProvider && currentProvider != providerId) {
+            if (currentProvider && currentProvider != ruc) {
                 const confirmed = await showConfirm("¿Cambiar de proveedor? Esto borrará los productos ya agregados.");
                 if (!confirmed) {
                     document.getElementById('providerSelect').value = currentProvider;
@@ -726,8 +744,8 @@
             try {
                 document.getElementById('productSelect').disabled = true;
                 document.getElementById('productSelect').innerHTML = '<option value="">Cargando productos...</option>';
-                
-                const response = await fetch(`../actions/Orders.php?action=getProducts&providerId=${providerId}`);
+
+                const response = await fetch(`../actions/Orders.php?action=getProducts&ruc=${ruc}`);
                 const data = await response.json();
                 
                 if (!data || data.error) {
@@ -748,7 +766,7 @@
                 });
                 
                 document.getElementById('productQuantity').disabled = false;
-                document.getElementById('providerSelect').dataset.currentProvider = providerId;
+                document.getElementById('providerSelect').dataset.currentProvider = ruc;
             } catch (error) {
                 showToast('Error al cargar productos: ' + error.message, 'error');
                 console.error('Error:', error);
@@ -756,24 +774,37 @@
         }
         
         // Función para mostrar el modal
-        function showModal(isNew = true) {
-            document.getElementById('modalTitle').textContent = isNew ? 'Nueva Orden de Compra' : 'Editar Orden de Compra';
-            document.getElementById('orderId').value = '';
-            document.getElementById('providerSelect').value = '';
-            document.getElementById('productSelect').innerHTML = '<option value="">Seleccione un producto</option>';
-            document.getElementById('productSelect').disabled = true;
-            document.getElementById('productQuantity').disabled = true;
-            document.getElementById('productQuantity').value = '1';
-            document.getElementById('selectedProductsBody').innerHTML = '';
-            document.getElementById('orderStatus').value = 'Pendiente';
-            
-            if (isNew) {
-                loadProviders();
-            }
-            
-            document.getElementById('orderModal').style.display = 'block';
-        }
-        
+       async function showModal(isNew = true,    orderData = null) {
+    const modal = document.getElementById('orderModal');
+    modal.style.display = 'block';
+
+    // Título del modal
+    document.getElementById('modalTitle').textContent = isNew ? 'Nueva Orden de Compra' : 'Editar Orden de Compra';
+
+    // Resetear campos
+    document.getElementById('orderId').value = '';
+    document.getElementById('orderStatus').value = 'Pendiente';
+    document.getElementById('selectedProductsBody').innerHTML = '';
+
+    // Limpiar y desactivar producto
+    const productSelect = document.getElementById('productSelect');
+    productSelect.innerHTML = '<option value="">Seleccione un producto</option>';
+    productSelect.disabled = true;
+
+    const productQuantity = document.getElementById('productQuantity');
+    productQuantity.value = '1';
+    productQuantity.disabled = true;
+
+    // Proveedor
+    const providerSelect = document.getElementById('providerSelect');
+    providerSelect.disabled = false;
+    if (isNew) {
+        providerSelect.dataset.currentProvider = ''; // ✅ LIMPIAR para evitar mensaje de cambio
+        loadProviders();
+    }
+
+    modal.style.display = 'block';
+}
         // Función para agregar producto a la lista
         function addProductToList() {
             const productSelect = document.getElementById('productSelect');
@@ -826,91 +857,90 @@
         }
         
         // Función para guardar la orden
-        // Función para guardar la orden
+
         async function saveOrder() {
-            // ✅ Validar que el usuario esté cargado
-            if (!currentUser || !currentUser.id) {
-                showToast('Error: Usuario no cargado. Recarga la página o espera unos segundos.', 'error');
-                return;
-            }
-
-            const providerId = document.getElementById('providerSelect').value;
-            const orderId = document.getElementById('orderId').value;
-            const status = document.getElementById('orderStatus').value;
-            const isEdit = !!orderId;
-            const products = [];
-
-            // Validar proveedor
-            if (!providerId) {
-                showToast('Debe seleccionar un proveedor', 'warning');
-                return;
-            }
-
-            // Validar productos
-            const productRows = document.querySelectorAll('#selectedProductsBody tr');
-            if (productRows.length === 0) {
-                showToast('Debe agregar al menos un producto', 'warning');
-                return;
-            }
-
-            // Obtener la moneda de referencia (del primer producto)
-            const firstProductRow = productRows[0];
-            const monedaReferencia = firstProductRow.dataset.moneda || 'USD';
-
-            // Validar que todos los productos tengan la misma moneda
-            let monedaInvalida = false;
-            productRows.forEach(row => {
-                const productMoneda = row.dataset.moneda || 'USD';
-                if (productMoneda !== monedaReferencia) {
-                    monedaInvalida = true;
-                }
-
-                products.push({
-                    id: row.dataset.productId,
-                    quantity: row.cells[1].textContent,
-                    price: row.dataset.price,
-                    moneda: productMoneda
-                });
-            });
-
-            if (monedaInvalida) {
-                showToast(`Error: Todos los productos deben ser en ${monedaReferencia}. No se puede mezclar monedas.`, 'error');
-                return;
-            }
-
-            const orderData = {
-                orderId: orderId,
-                providerId: providerId,
-                userId: currentUser.id, // 
-                products: products,
-                status: status,
-                moneda: monedaReferencia
-            };
-
-            try {
-                const endpoint = isEdit ? 'updateOrder' : 'saveOrder';
-                const response = await fetch(`../actions/Orders.php?action=${endpoint}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                const data = await response.json();
-
-                if (!data || data.error) {
-                    throw new Error(data?.message || 'Error al guardar la orden');
-                }
-
-                showToast(`Orden ${isEdit ? 'actualizada' : 'creada'} correctamente`, 'success');
-                document.getElementById('orderModal').style.display = 'none';
-                loadOrders();
-            } catch (error) {
-                showToast('Error al guardar la orden: ' + error.message, 'error');
-                console.error('Error:', error);
-            }
+    try {
+        // Validación inicial
+        if (!currentUser?.id) {
+            throw new Error('Usuario no autenticado');
         }
+
+        const orderId = document.getElementById('orderId').value;
+        const isEdit = !!orderId;
+        const providerSelect = document.getElementById('providerSelect');
+        
+        // Obtener RUC (maneja tanto edición como creación)
+        const ruc = isEdit ? providerSelect.dataset.currentProvider : providerSelect.value;
+        const status = document.getElementById('orderStatus').value;
+        const rucMiEmpresa = document.getElementById('rucMiEmpresa').value.trim();
+
+        // Validaciones
+        if (!ruc) throw new Error('Proveedor no seleccionado');
+        if (!rucMiEmpresa) throw new Error('RUC de empresa no configurado');
+
+        // Procesar productos
+        const products = [];
+        const productRows = document.querySelectorAll('#selectedProductsBody tr');
+        
+        if (productRows.length === 0) {
+            throw new Error('Agrega al menos un producto');
+        }
+
+        // Validar moneda consistente
+        const firstMoneda = productRows[0].dataset.moneda || 'USD';
+        productRows.forEach(row => {
+            const moneda = row.dataset.moneda || 'USD';
+            if (moneda !== firstMoneda) {
+                throw new Error(`Todos los productos deben ser en ${firstMoneda}`);
+            }
+            
+            products.push({
+                id: row.dataset.productId,
+                quantity: row.cells[1].textContent.trim(),
+                price: row.dataset.price,
+                moneda: moneda
+            });
+        });
+
+        // Preparar datos
+        const orderData = {
+    orderId: orderId,
+        // No incluir ruc en ediciones
+        ruc: isEdit ? undefined : document.getElementById('providerSelect').value,
+        rucMiEmpresa: rucMiEmpresa,
+        userId: currentUser.id,
+        products: products,
+        status: status,
+        moneda: firstMoneda
+    };
+
+    // Limpiar campo ruc si es edición
+    if (isEdit) {
+        delete orderData.ruc;
+    }
+
+        console.log('Enviando:', orderData); // Debug
+
+        // Enviar al servidor
+        const endpoint = isEdit ? 'updateOrder' : 'saveOrder';
+        const response = await fetch(`../actions/Orders.php?action=${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await response.json();
+        if (result.error) throw new Error(result.message);
+
+        showToast(`Orden ${isEdit ? 'actualizada' : 'creada'}`, 'success');
+        document.getElementById('orderModal').style.display = 'none';
+        loadOrders();
+
+    } catch (error) {
+        console.error('Error saveOrder:', error);
+        showToast(error.message, 'error');
+    }
+}
 
         
         // Función para ver detalles de la orden
@@ -1004,61 +1034,67 @@
             document.getElementById('viewOrderModal').style.display = 'none';
         }
         
-        // Función para editar orden
-        async function editOrder(orderId) {
-            try {
-                showModal(false);
-                document.getElementById('modalTitle').textContent = `Editar Orden N°000${orderId}`;
-                document.getElementById('orderId').value = orderId;
-                
-                // Cargar proveedores
-                await loadProviders();
-                
-                // Obtener datos de la orden
-                const response = await fetch(`../actions/Orders.php?action=getOrderDetails&orderId=${orderId}`);
-                const data = await response.json();
-                
-                if (!data || data.error) {
-                    throw new Error(data?.message || 'Error al cargar la orden');
-                }
-                
-                // Establecer el estado actual
-                document.getElementById('orderStatus').value = data.order.Estado;
-                
-                // Establecer proveedor
-                const providerSelect = document.getElementById('providerSelect');
-                providerSelect.value = data.order.IDProveedor;
-                providerSelect.dataset.currentProvider = data.order.IDProveedor;
-                
-                // Cargar productos del proveedor
-                await loadProducts(data.order.IDProveedor);
-                
-                // Cargar productos seleccionados
-                const tbody = document.getElementById('selectedProductsBody');
-                tbody.innerHTML = '';
-                
-                if (data.products && data.products.length > 0) {
-                    data.products.forEach(product => {
-                        const row = document.createElement('tr');
-                        row.dataset.productId = product.IDProducto;
-                        row.dataset.moneda = product.Moneda || 'USD';
-                        row.dataset.price = product.PrecioUnitario;
-                        row.innerHTML = `
-                            <td>${product.Nombre}</td>
-                            <td>${product.Cantidad}</td>
-                            <td>${product.PrecioUnitario} ${product.Moneda || 'USD'}</td>
-                            <td>${(product.Cantidad * product.PrecioUnitario).toFixed(2)} ${product.Moneda || 'USD'}</td>
-                            <td><button class="btn btn-danger" onclick="removeProductFromList(this)">Eliminar</button></td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                showToast('Error al cargar la orden para editar: ' + error.message, 'error');
-                console.error('Error:', error);
-                document.getElementById('orderModal').style.display = 'none';
-            }
+    
+async function editOrder(orderId) {
+    try {
+        // Mostrar el modal primero
+        showModal(false);
+        document.getElementById('modalTitle').textContent = `Editar Orden N°000${orderId}`;
+        document.getElementById('orderId').value = orderId;
+
+        // Obtener datos de la orden
+        const response = await fetch(`../actions/Orders.php?action=getOrderDetails&orderId=${orderId}`);
+        const data = await response.json();
+        console.log("Datos recibidos del servidor:", data); // Para debug
+        
+        if (!data || data.error) {
+            throw new Error(data?.message || 'Error al cargar la orden');
         }
+
+        // Establecer el estado actual
+        document.getElementById('orderStatus').value = data.order.Estado;
+        
+        // Cargar proveedores y establecer el proveedor actual
+        
+        const providerSelect = document.getElementById('providerSelect');
+        console.log('Datos recibidos:', data);
+        console.log('RUC de la orden:', data.order.RUC);
+        console.log('Opciones de proveedor:', providerSelect.options);
+        providerSelect.value = data.order.RUC;
+        providerSelect.dataset.currentProvider = data.order.RUC;
+        
+        // Deshabilitar el select de proveedor para evitar cambios
+        providerSelect.disabled = true;
+        
+        // Cargar productos del proveedor
+        await loadProducts(data.order.RUC);
+        
+        // Cargar productos seleccionados
+        const tbody = document.getElementById('selectedProductsBody');
+        tbody.innerHTML = '';
+        
+        if (data.products && data.products.length > 0) {
+            data.products.forEach(product => {
+                const row = document.createElement('tr');
+                row.dataset.productId = product.IDProducto;
+                row.dataset.moneda = product.Moneda || 'USD';
+                row.dataset.price = product.PrecioUnitario;
+                row.innerHTML = `
+                    <td>${product.Nombre}</td>
+                    <td>${product.Cantidad}</td>
+                    <td>${product.PrecioUnitario} ${product.Moneda || 'USD'}</td>
+                    <td>${(product.Cantidad * product.PrecioUnitario).toFixed(2)} ${product.Moneda || 'USD'}</td>
+                    <td><button class="btn btn-danger" onclick="removeProductFromList(this)">Eliminar</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } catch (error) {
+        showToast('Error al cargar la orden para editar: ' + error.message, 'error');
+        console.error('Error:', error);
+        document.getElementById('orderModal').style.display = 'none';
+    }
+}
         
         // Función para eliminar orden
         async function deleteOrder(orderId) {
@@ -1096,9 +1132,32 @@
                 document.getElementById('orderModal').style.display = 'none';
             });
             
-            document.getElementById('providerSelect').addEventListener('change', (e) => {
-                loadProducts(e.target.value);
+            document.getElementById('providerSelect').addEventListener('change', async function () {
+                const select = document.getElementById('providerSelect');
+                const nuevoRUC = select.value;
+                const proveedorActual = select.dataset.currentProvider;
+
+                // Verificar si ya hay productos agregados
+                const tieneProductos = document.querySelectorAll('#selectedProductsBody tr').length > 0;
+
+                if (proveedorActual && proveedorActual !== nuevoRUC && tieneProductos) {
+                    const confirmar = await showConfirm("¿Cambiar de proveedor? Esto borrará los productos ya agregados.");
+                    if (!confirmar) {
+                        // Revertimos el cambio de proveedor
+                        select.value = proveedorActual;
+                        return;
+                    }
+
+                    // Si acepta, borramos productos
+                    document.getElementById('selectedProductsBody').innerHTML = '';
+                }
+
+                // Cargar productos del nuevo proveedor seleccionado
+                if (nuevoRUC) {
+                    await loadProducts(nuevoRUC);
+                }
             });
+
             
             document.getElementById('btnAddProduct').addEventListener('click', addProductToList);
             document.getElementById('btnSaveOrder').addEventListener('click', saveOrder);

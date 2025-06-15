@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     Correo VARCHAR(100) NOT NULL,
     Rol VARCHAR(50) NOT NULL,
     Contrasena VARCHAR(255) NOT NULL,
-    token VARCHAR(255) DEFAULT NULL 
+    token VARCHAR(255) DEFAULT NULL
 )");
 
 $conn->query("
 CREATE TABLE IF NOT EXISTS Proveedores (
-    IDProveedor INT AUTO_INCREMENT PRIMARY KEY,
+    RUC VARCHAR(20) PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL,
     Direccion VARCHAR(200) NOT NULL,
     Telefono VARCHAR(20) NOT NULL,
@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS Productos (
     Descripcion TEXT NOT NULL,
     Precio DECIMAL(10,2) NOT NULL,
     Moneda ENUM('PEN', 'USD') NOT NULL DEFAULT 'PEN',
-    IDProveedor INT,
-    FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor)
+    RUC VARCHAR(20),
+    FOREIGN KEY (RUC) REFERENCES Proveedores(RUC)
 )");
 
 
@@ -62,14 +62,23 @@ CREATE TABLE IF NOT EXISTS Inventario (
 )");
 
 $conn->query("
+CREATE TABLE IF NOT EXISTS InfoEmpresa (
+    RUC VARCHAR(20) PRIMARY KEY,
+    Nombre VARCHAR(150) NOT NULL,
+    Correo VARCHAR(100) NOT NULL,
+    Direccion VARCHAR(200) NOT NULL,
+    Celular VARCHAR(20) NOT NULL
+);");
+
+$conn->query("
 CREATE TABLE IF NOT EXISTS OrdenesCompra (
     IDOrden INT AUTO_INCREMENT PRIMARY KEY,
     FechaOrden DATE NOT NULL,
     Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
-    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN', 
-    IDProveedor INT,
+    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN',
+    RUCProveedor VARCHAR(20),
     IDUsuario INT,
-    FOREIGN KEY (IDProveedor) REFERENCES Proveedores(IDProveedor),
+    FOREIGN KEY (RUCProveedor) REFERENCES Proveedores(RUC),
     FOREIGN KEY (IDUsuario) REFERENCES Usuarios(IDUsuario)
 )");
 
