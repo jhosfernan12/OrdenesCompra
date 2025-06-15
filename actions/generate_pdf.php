@@ -1,8 +1,51 @@
 <?php
-ob_start(); // Evita errores por salida antes del PDF
 
 require_once __DIR__.'/../includes/fpdf/fpdf.php';
+if (isset($_GET['check']) && $_GET['check'] == '1') {
+    header('Content-Type: application/json');
 
+    $conn = new mysqli("localhost", "root", "", "OrdenesCompra");
+    if ($conn->connect_error) {
+        echo json_encode(['success' => false, 'message' => 'Error de conexión']);
+        exit;
+    }
+    $conn->set_charset("utf8");
+
+    $orderId = intval($_GET['orderId'] ?? 0);
+    if ($orderId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'ID de orden no válido']);
+        exit;
+    }
+
+    $res = $conn->query("SELECT * FROM InfoEmpresa LIMIT 1");
+    $infoEmpresa = ($res && $res->num_rows > 0) ? $res->fetch_assoc() : [];
+
+    $stmt = $conn->prepare("SELECT * FROM OrdenesCompra WHERE IDOrden = ?");
+    $stmt->bind_param("i", $orderId);
+    $stmt->execute();
+    $order = $stmt->get_result()->fetch_assoc();
+
+    $provider = null;
+    if ($order) {
+        $stmt = $conn->prepare("SELECT * FROM Proveedores WHERE RUC = ?");
+        $stmt->bind_param("s", $order['RUCProveedor']);
+        $stmt->execute();
+        $provider = $stmt->get_result()->fetch_assoc();
+    }
+
+    $conn->close();
+
+    if (!$order) {
+        echo json_encode(['success' => false, 'message' => 'Orden no encontrada']);
+    } elseif (empty($infoEmpresa['RUC'])) {
+        echo json_encode(['success' => false, 'message' => 'Debe registrar el RUC en InfoEmpresa']);
+    } elseif (!$provider) {
+        echo json_encode(['success' => false, 'message' => 'Proveedor no encontrado']);
+    } else {
+        echo json_encode(['success' => true]);
+    }
+    exit;
+}
 // Configuración de la base de datos
 $servername = "localhost";
 $username = "root";
@@ -32,6 +75,15 @@ if ($result && $result->num_rows > 0) {
     $infoEmpresa = $result->fetch_assoc();
 }
 $conn->close();
+
+if (empty($infoEmpresa) || empty($infoEmpresa['RUC'])) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'No se encontró información válida de la empresa. Por favor registre el RUC en InfoEmpresa.'
+    ]);
+    exit;
+}
 
 // Clase personalizada de PDF
 class PDF extends FPDF {

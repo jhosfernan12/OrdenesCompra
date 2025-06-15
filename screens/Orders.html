@@ -1118,9 +1118,24 @@ async function editOrder(orderId) {
         }
         
         // Función para imprimir orden (PDF)
-        function printOrder(orderId) {
-            window.open(`../actions/generate_pdf.php?orderId=${orderId}`, '_blank');
-        }
+      function printOrder(orderId) {
+        fetch(`../actions/generate_pdf.php?orderId=${orderId}&check=1`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Abre el PDF en nueva pestaña
+                    window.open(`../actions/generate_pdf.php?orderId=${orderId}`, '_blank');
+                } else {
+                    // Mostrar TOAST de error (con Bootstrap o tu sistema)
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar PDF:', error);
+                showToast('Error al verificar PDF.', 'danger');
+            });
+    }
+
         
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
