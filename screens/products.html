@@ -8,18 +8,18 @@
     /* Contenedor principal que contiene todo */
     body, html, input, button, select {
       font-family: 'Poppins', sans-serif;
-      background-color: #ffffff;
+      background-color: #e7e7e7;
       font-weight: 550;  /* Semibold */
     }
     
     #app {
       display: flex;
-      max-width: 1400px;
+      max-width: 1390px;
       margin: 40px auto;
       height: 600px;
       box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
       border-radius: 10px;
-      overflow: hidden;
+      overflow-y: auto;
       background: #fff;
     }
 
@@ -37,12 +37,23 @@
       flex: 0 0 1000px; /* se reduce para dar espacio al formulario */
     }
 
-    h1, h2, h3 {
-      text-align: center;
+    h2, h3 {
       margin-bottom: 20px;
       font-weight: 500;
       color: #333;
+
+      text-align: flex-end;
     }
+
+    h1 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #000000;
+      border-bottom: 1px solid #e0e0e0;
+
+    }
+
+    
 
     button, input[type="submit"] {
       background-color: #562870;
@@ -137,6 +148,24 @@
     .deleteBtn:hover {
       background-color: #bd2130;
     }
+    .search-bar {
+      display: flex;
+      margin-bottom: 20px;
+      gap: 10px;
+      border-radius: 10px;
+      max-width: 500px; 
+      width: 100%;
+    }
+
+      .search-bar input {
+        flex: 1;
+        padding: 10px 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+
 
     
     /* Formulario - inicialmente oculto con ancho 0 */
@@ -203,6 +232,7 @@
       user-select: none;
       position: relative;
     }
+    
 
     /* Animación */
     @keyframes slideIn {
@@ -302,7 +332,7 @@
           <button id="dashboardBtn" class="btn">← Regresar al Dashboard</button>
      </div>
 
-      <div>
+      <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Buscar por nombre..." />
       </div>
 
@@ -330,11 +360,11 @@
         <input type="hidden" id="productId" name="id" />
         <label for="name">
           Nombre:<br />
-          <input type="text" id="name" name="name" required autocomplete="off" />
+          <input type="text" id="name" name="name" maxlength="20" required autocomplete="off" />
         </label>
         <label for="description">
           Descripción:<br />
-          <input type="text" id="description" name="description" required />
+          <input type="text" id="description" maxlength="35" name="description" required />
         </label>
         <label for="price">
           Precio:<br />

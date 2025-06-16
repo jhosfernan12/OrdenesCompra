@@ -12,14 +12,15 @@
             font-weight: 550;
         }
         
-        #app {
-            display: flex;
-            max-width: 1400px;
-            margin: 40px auto;
-            box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
-            border-radius: 10px;
-            overflow: hidden;
-            background: #fff;
+       #app {
+        display: flex;
+        max-width: 1390px;
+        margin: 40px auto;
+        height: 600px;
+        box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+        border-radius: 10px;
+        overflow-y: auto;
+        background: #fff;
         }
 
         /* Contenido principal */
@@ -38,10 +39,20 @@
         }
 
         h1, h2, h3 {
-            text-align: center;
             margin-bottom: 20px;
             font-weight: 500;
             color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: flex-end;
+   
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 1000;
+            color: #000000;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: flex-end;
+   
         }
 
         /* Botones */
@@ -112,6 +123,9 @@
         thead {
             background-color: #562870da;
             color: white;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            
         }
         
         th, td {
@@ -119,6 +133,7 @@
             border: 1px solid #e0e0e0;
             text-align: left;
             vertical-align: middle;
+            white-space: nowrap;
         }
 
         tbody tr:nth-child(even) {
@@ -299,6 +314,10 @@
         .search-container {
             display: flex;
             margin-bottom: 20px;
+            gap: 10px;
+            border-radius: 10px;
+            max-width: 500px; 
+            width: 100%;
         }
         
         #search {
@@ -363,7 +382,7 @@
             <form id="editForm" onsubmit="event.preventDefault(); submitForm();">
 
                 <label for="editNombre">Nombre:</label>
-                <input type="text" id="editNombre" required>
+                <input type="text" id="editNombre" title="30 dígitos" maxlength="30"  required>
 
                 <input type="hidden" id="originalRUC" name="originalRUC">
 
@@ -371,7 +390,7 @@
                 <input type="text" id="editRUC" pattern="\d{11}" title="11 dígitos" maxlength="11" required>
 
                 <label for="editDireccion">Dirección:</label>
-                <input type="text" id="editDireccion" required>
+                <input type="text" id="editDireccion" title="50 dígitos" maxlength="50"  required>
                 
                 <label for="editTelefono">Teléfono:</label>
                 <input type="tel" id="editTelefono" pattern="\d{9}" title="9 dígitos" maxlength="9" required>

@@ -85,6 +85,30 @@ if (empty($infoEmpresa) || empty($infoEmpresa['RUC'])) {
     exit;
 }
 
+// Obtener color personalizado desde la URL
+$hexColor = isset($_GET['color']) ? $_GET['color'] : '6b5b95'; // Valor por defecto si no envían nada
+
+// Función para convertir HEX a RGB
+function hexToRgb($hex) {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) == 3) {
+        $hex = $hex[0].$hex[0] . $hex[1].$hex[1] . $hex[2].$hex[2];
+    }
+    return [
+        hexdec(substr($hex, 0, 2)),
+        hexdec(substr($hex, 2, 2)),
+        hexdec(substr($hex, 4, 2))
+    ];
+}
+
+$colorPrimario = hexToRgb($hexColor);
+$colorFondoClaro = [
+    min($colorPrimario[0] + 130, 255),
+    min($colorPrimario[1] + 130, 255),
+    min($colorPrimario[2] + 130, 255)
+];
+
+
 // Clase personalizada de PDF
 class PDF extends FPDF {
     public $logoPath;
@@ -96,7 +120,7 @@ class PDF extends FPDF {
 
     function Header() {
         if (file_exists($this->logoPath)) {
-            $this->Image($this->logoPath, 15, 10, 80); 
+            $this->Image($this->logoPath, 15, 10, 45, 0); 
             $this->SetY(10);
         } else {
             $this->SetY(20);
@@ -129,9 +153,17 @@ class PDF extends FPDF {
     }
 }
 
+
 // Crear PDF
 $pdf = new PDF('P', 'mm', 'A4');
-$pdf->logoPath = __DIR__.'/../UI/assets/logo.png';
+$logoSubido = __DIR__.'/../UI/assets/logos/logo.png';
+$logoPorDefecto = __DIR__.'/../UI/assets/logos/logodefault.png';
+
+$pdf->colorPrimario = $colorPrimario;
+$pdf->colorFondoClaro = $colorFondoClaro;
+
+$pdf->logoPath = file_exists($logoSubido) ? $logoSubido : $logoPorDefecto;
+
 $pdf->orderId = $orderId;
 $pdf->empresaRUC = $infoEmpresa['RUC'];
 $pdf->infoEmpresa = $infoEmpresa;
@@ -142,6 +174,7 @@ $pdf->SetMargins(15, 15, 15);
 $pdf->SetTextColor(0, 0, 0);
 
 // Información básica
+$pdf->Ln(15);
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(40, 7, utf8_decode('Fecha:'), 0, 0);
 $pdf->SetFont('Arial', '', 10);

@@ -7,39 +7,50 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Estilos base */
-       body, html, input, button, select {
+        body, input, button, select {
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
             background-color: #e7e7e7;
-            font-weight: 550;
+            font-weight: 600;
         }
 
-        #app {
+
+       #app {
             display: flex;
-            max-width: 950px;
-            margin: 40px auto;
-            box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
+            flex-direction: column;
+            width: auto;                   /* Solo lo necesario en ancho */
+            max-width: 1100px;             /* Nunca sobrepasa el contenedor padre o pantalla */
+            height: auto;                 /* Se adapta al contenido verticalmente */
+            margin: 10px auto;            /* Centrado horizontal con margen vertical */
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             border-radius: 10px;
-            overflow: hidden;
             background: #fff;
+            word-wrap: break-word;
+            overflow: auto;  
+            box-sizing: border-box;
         }
+
+
+
         
         /* Contenedor principal */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            
         }
         
         /* Encabezado */
         .header {
-            display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 1px solid #e0e0e0;
+            text-align: flex-end;
 
         }
         
@@ -84,12 +95,15 @@
         }
         
         /* Barra de búsqueda */
-        .search-bar {
-            display: flex;
+       .search-bar { 
+        display: flex;
             margin-bottom: 20px;
             gap: 10px;
             border-radius: 10px;
+            max-width: 500px; 
+            width: 100%;
         }
+
         
         .search-input {
             flex: 1;
@@ -114,12 +128,16 @@
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
         
         .orders-table thead {
             background-color: #562870da;
             color: white;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
         
         .orders-table th, 
@@ -151,9 +169,10 @@
             margin: 50px auto;
             padding: 25px;
             border-radius: 10px;
-            max-width: 800px;
+            max-width: 950px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             position: relative;
+            overflow: auto;
         }
         
         .modal-header {
@@ -1117,24 +1136,26 @@ async function editOrder(orderId) {
             }
         }
         
-        // Función para imprimir orden (PDF)
-      function printOrder(orderId) {
-        fetch(`../actions/generate_pdf.php?orderId=${orderId}&check=1`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Abre el PDF en nueva pestaña
-                    window.open(`../actions/generate_pdf.php?orderId=${orderId}`, '_blank');
-                } else {
-                    // Mostrar TOAST de error (con Bootstrap o tu sistema)
-                    showToast(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error al verificar PDF:', error);
-                showToast('Error al verificar PDF.', 'danger');
-            });
-    }
+        function printOrder(orderId) {
+            const color = localStorage.getItem('colorPrimario') || '6b5b95'; // Si no está en localStorage, usa un valor por defecto.
+
+            // Llamada para validar
+            fetch(`../actions/generate_pdf.php?orderId=${orderId}&check=1&color=${color}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Llamada real con color al abrir el PDF
+                        window.open(`../actions/generate_pdf.php?orderId=${orderId}&color=${color}`, '_blank');
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al verificar PDF:', error);
+                    showToast('Error al verificar PDF.', 'danger');
+                });
+        }
+
 
         
         // Event listeners
