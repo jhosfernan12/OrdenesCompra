@@ -146,7 +146,7 @@ if (!isset($_SESSION['usuario'])) {
     <div class="container">
         <div class="sidebar">
             <div class="logo">
-                <img src="../UI/assets/logodefault.png" alt="Logo" style="width: 115%; max-width: 500px; height: auto;">
+                <img src="../UI/assets/logos/logodefault.png" alt="Logo" style="width: 115%; max-width: 500px; height: auto;">
             </div>
             <nav class="sidebar-nav">
                 <a href="#" id="linkSuppliers"><i class="fas fa-truck"></i> Gestión Proveedores</a>
