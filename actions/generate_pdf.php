@@ -86,21 +86,30 @@ if (empty($infoEmpresa) || empty($infoEmpresa['RUC'])) {
 }
 
 // Obtener color personalizado desde la URL
-$hexColor = isset($_GET['color']) ? $_GET['color'] : '6b5b95'; // Valor por defecto si no envían nada
+$hexColor = isset($_GET['color']) ? $_GET['color'] : '6b5b95';
+
+// Eliminar # si existe y validar formato
+$hexColor = ltrim($hexColor, '#');
+if (!preg_match('/^[0-9A-Fa-f]{6}$/', $hexColor)) {
+    $hexColor = '6b5b95'; // Valor por defecto si no es válido
+}
 
 // Función para convertir HEX a RGB
 function hexToRgb($hex) {
     $hex = ltrim($hex, '#');
     if (strlen($hex) == 3) {
-        $hex = $hex[0].$hex[0] . $hex[1].$hex[1] . $hex[2].$hex[2];
+        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
     }
-    return [
-        hexdec(substr($hex, 0, 2)),
-        hexdec(substr($hex, 2, 2)),
-        hexdec(substr($hex, 4, 2))
-    ];
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    
+    return [$r, $g, $b];
 }
 
+
+
+// Configurar colores para el PDF
 $colorPrimario = hexToRgb($hexColor);
 $colorFondoClaro = [
     min($colorPrimario[0] + 130, 255),
@@ -156,11 +165,14 @@ class PDF extends FPDF {
 
 // Crear PDF
 $pdf = new PDF('P', 'mm', 'A4');
-$logoSubido = __DIR__.'/../UI/assets/logos/logo.png';
-$logoPorDefecto = __DIR__.'/../UI/assets/logos/logodefault.png';
 
 $pdf->colorPrimario = $colorPrimario;
 $pdf->colorFondoClaro = $colorFondoClaro;
+
+$logoSubido = __DIR__.'/../UI/assets/logos/logo.png';
+$logoPorDefecto = __DIR__.'/../UI/assets/logos/logodefault.png';
+
+
 
 $pdf->logoPath = file_exists($logoSubido) ? $logoSubido : $logoPorDefecto;
 

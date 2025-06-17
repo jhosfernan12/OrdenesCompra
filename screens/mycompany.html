@@ -197,6 +197,20 @@
             transition: border-color 0.3s;
             align-items: center;
         }
+
+        
+        .form-control-color {
+            width: 800px;
+            height: 100px;
+            padding: 10px 15px;
+            border-radius: 2px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            align-items: center;
+        }
+
+
         
         .form-control:focus {
             border-color: #562870;
@@ -453,7 +467,7 @@
 
       <div class="form-group">
         <label class="form-label" for="colorPrimario">Color primario (para PDF):</label>
-        <input class="form-control" type="color" id="colorPrimario" name="colorPrimario" value="#6b5b95">
+        <input class="form-control-color" type="color" id="colorPrimario" name="colorPrimario" value="#6b5b95">
       </div>
 
         <!-- Botón de guardado y mensaje -->
@@ -545,27 +559,47 @@
   setTimeout(() => toast.remove(), 4000);
 }
 
-  // Enviar formulario
-  companyForm.addEventListener('submit', function (e) {
-    e.preventDefault();
+ // Enviar formulario
+companyForm.addEventListener('submit', function (e) {
+  e.preventDefault();
 
-    const formData = new FormData(this);
-    fetch('../actions/mycompany.php?action=save', {
-      method: 'POST',
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        showToast('Datos guardados correctamente.', 'success');
-        loadCompany();
-        companyForm.style.display = 'none';
-        editBtn.textContent = 'Editar Empresa';
-      } else {
-        showToast(data.message || 'Error al guardar.', 'error');
-      }
-    });
+  // Obtener el valor del input de color
+  const colorInput = document.getElementById('colorPrimario');
+  let colorValue = colorInput.value.trim().replace('#', ''); // Eliminar el '#' si lo tiene
+
+  // Validar el color hexadecimal
+  if (/^[0-9A-Fa-f]{6}$/.test(colorValue)) {
+    localStorage.setItem('colorPrimario', colorValue); // Guardar color válido
+  } else {
+    localStorage.setItem('colorPrimario', '#6b5b95'); // Guardar color por defecto
+  }
+
+  // Preparar los datos del formulario para enviar
+  const formData = new FormData(this);
+
+  fetch('../actions/mycompany.php?action=save', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast('Datos guardados correctamente.', 'success');
+      loadCompany();
+      companyForm.style.display = 'none';
+      editBtn.textContent = 'Editar Empresa';
+
+      // (Opcional) Si luego necesitas abrir un PDF con el color:
+      const color = localStorage.getItem('colorPrimario');
+      const encodedColor = encodeURIComponent(color);
+      const url = `../actions/generate_pdf.php?orderId=1&color=${encodedColor}`;
+      // window.open(url, '_blank'); // Descomenta esto si necesitas abrir el PDF
+    } else {
+      showToast(data.message || 'Error al guardar.', 'error');
+    }
   });
+});
+
 </script>
 </body>
 </html>

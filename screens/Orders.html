@@ -1136,26 +1136,31 @@ async function editOrder(orderId) {
             }
         }
         
-        function printOrder(orderId) {
-            const color = localStorage.getItem('colorPrimario') || '6b5b95'; // Si no está en localStorage, usa un valor por defecto.
-
-            // Llamada para validar
-            fetch(`../actions/generate_pdf.php?orderId=${orderId}&check=1&color=${color}`)
+       function printOrder(orderId) {
+            // Obtener y normalizar el color
+            let color = localStorage.getItem('colorPrimario') || '6b5b95';
+           
+            
+            // Codificar SOLO el # (no todo el valor)
+            const encodedColor = `%23${color.substring(1)}`;
+            
+            // Construir URL de forma segura
+            const params = new URLSearchParams();
+            params.append('orderId', orderId);
+            params.append('color', color);
+            const pdfUrl = `../actions/generate_pdf.php?${params.toString()}`;
+            
+            // Validar y abrir
+            fetch(`${pdfUrl}&check=1`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Llamada real con color al abrir el PDF
-                        window.open(`../actions/generate_pdf.php?orderId=${orderId}&color=${color}`, '_blank');
+                        window.open(pdfUrl, '_blank');
                     } else {
                         showToast(data.message, 'error');
                     }
-                })
-                .catch(error => {
-                    console.error('Error al verificar PDF:', error);
-                    showToast('Error al verificar PDF.', 'danger');
                 });
         }
-
 
         
         // Event listeners

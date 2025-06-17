@@ -4,19 +4,6 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Función para convertir color HEX a RGB
-function hexToRgb($hex) {
-    $hex = ltrim($hex, '#');
-    if (strlen($hex) == 3) {
-        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
-    }
-    return [
-        hexdec(substr($hex, 0, 2)),
-        hexdec(substr($hex, 2, 2)),
-        hexdec(substr($hex, 4, 2))
-    ];
-}
-
 // Manejo global de errores
 set_exception_handler(function ($e) {
     http_response_code(500);
@@ -53,10 +40,6 @@ if ($action === 'save') {
     $direccion = $_POST['direccion'] ?? '';
     $celular = $_POST['celular'] ?? '';
 
-    // 🔵 Color recibido desde el formulario (no se guarda en la BD)
-    $colorHex = $_POST['colorPrimario'] ?? '#6b5b95';  // Valor por defecto
-    $colorRGB = hexToRgb($colorHex);
-
     if (strlen($ruc) < 11) {
         echo json_encode(['success' => false, 'message' => 'El RUC debe tener 11 dígitos.']);
         exit;
@@ -84,9 +67,9 @@ if ($action === 'save') {
     }
     $stmt->close();
 
-    // Procesar el logo si se subió
+    // Procesar el logo si se subió (sin cambios aquí)
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['logo']['tmp_name'];
+         $fileTmpPath = $_FILES['logo']['tmp_name'];
         $fileName = 'logo.png';
         $destPath = '../UI/assets/logos/' . $fileName;
 
@@ -142,7 +125,6 @@ if ($action === 'save') {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Logo redimensionado correctamente.',
-                    'colorRGB' => $colorRGB
                 ]);
                 exit;
             } else {
@@ -155,11 +137,9 @@ if ($action === 'save') {
         }
     }
 
-    // Si no se subió logo, igual mostramos el color para usarlo en PDF o CSS dinámico
     echo json_encode([
         'success' => true,
-        'message' => 'Datos guardados correctamente.',
-        'colorRGB' => $colorRGB
+        'message' => 'Datos guardados correctamente.'
     ]);
     exit;
 }
