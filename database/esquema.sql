@@ -42,18 +42,7 @@ CREATE TABLE IF NOT EXISTS Inventario (
     FOREIGN KEY (IDProducto) REFERENCES Productos(IDProducto)
 );
 
--- Tabla de OrdenesCompra
-CREATE TABLE IF NOT EXISTS OrdenesCompra (
-    IDOrden INT AUTO_INCREMENT PRIMARY KEY,
-    FechaOrden DATE NOT NULL,
-    Estado ENUM('Pendiente', 'Entregada', 'Cancelada', 'Rechazada') NOT NULL,
-    Moneda VARCHAR(3) NOT NULL DEFAULT 'PEN',
-    RUC VARCHAR(20),
-    IDUsuario INT,
-    FOREIGN KEY (RUC) REFERENCES Proveedores(RUC),
-    FOREIGN KEY (IDUsuario) REFERENCES Usuarios(IDUsuario)
-);
-
+-- Tabla de Informacion de Empresa
 CREATE TABLE IF NOT EXISTS InfoEmpresa (
     RUC VARCHAR(20) PRIMARY KEY,
     Nombre VARCHAR(150) NOT NULL,
