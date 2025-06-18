@@ -293,6 +293,15 @@
     .toast.confirm button.no {
         background-color: #dc3545;
     }
+
+    .search-bar {
+      display: grid;
+      margin-bottom: 20px;
+      gap: 10px;
+      border-radius: 10px;
+
+      
+    }
   </style>
 </head>
 <body>
@@ -309,7 +318,7 @@
         </a>
       </div>
 
-      <fieldset>
+      <fieldset class="search-bar">
         <legend>Filtros</legend>
         <label for="searchProduct">Buscar Producto:</label>
         <input type="text" id="searchProduct" placeholder="Nombre del producto">

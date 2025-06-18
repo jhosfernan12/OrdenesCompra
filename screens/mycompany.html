@@ -16,12 +16,12 @@
         
         #app {
           display: flex;
-          max-width: 1050px;
+          max-width: 1100px;
           margin: 40px auto;
           min-height: 100px;
-          box-shadow: 0 px 10px rgb(0 0 0 / 0.15);
+          box-shadow: 0 px 10px rgb(0 0 0 / 0.15);  /* ← ERROR aquí */
           border-radius: 10px;
-          overflow: hidden;
+          overflow: auto;
           background: #fff;
         }
         /* Contenedor principal */
@@ -121,6 +121,7 @@
         
         .orders-table th, 
         .orders-table td {
+            white-space: nowrap;
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e0e0e0;
@@ -461,14 +462,16 @@
         </div>
 
        <div class="form-group">
-        <label class="form-label" for="logo">Logo (PNG o JPG):</label>
+        <label class="form-label" for="logo">Logo de tu Empresa (PNG o JPG):</label>
         <input class="form-control" type="file" id="logo" name="logo" accept="image/png, image/jpeg">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="colorPrimario">Color primario (para PDF):</label>
-        <input class="form-control-color" type="color" id="colorPrimario" name="colorPrimario" value="#6b5b95">
-      </div>
+      <label class="form-label" for="colorPrimario">Color de tu Empresa (para PDF):</label>
+      <input class="form-control-color" type="color" id="colorPrimario" name="colorPrimario" value="#6b5b95">
+      <input type="text" id="colorHexValue" class="form-control" maxlength="7" style="width: 100px; margin-left: 10px;">
+    </div>
+
 
         <!-- Botón de guardado y mensaje -->
         <button type="submit" class="btn">Guardar Empresa</button>
@@ -479,45 +482,54 @@
 
   <script>
   // Cargar datos de la empresa al iniciar
-  function loadCompany() {
-    fetch('../actions/mycompany.php?action=get')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.empresa) {
-          const empresa = data.empresa;
-          for (let campo in empresa) {
-            if (document.getElementById(campo)) {
-              document.getElementById(campo).value = empresa[campo];
-            }
+  // Al cargar la empresa
+function loadCompany() {
+  fetch('../actions/mycompany.php?action=get')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.empresa) {
+        const empresa = data.empresa;
+        for (let campo in empresa) {
+          const input = document.getElementById(campo);
+          if (input) {
+            input.value = empresa[campo];
           }
-
-          const table = `
-            <h3>Empresa Registrada</h3>
-            <table class="orders-table">
-              <thead>
-                <tr>
-                  <th>RUC</th>
-                  <th>Nombre</th>
-                  <th>Correo</th>
-                  <th>Dirección</th>
-                  <th>Celular</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>${empresa.RUC}</td>
-                  <td>${empresa.Nombre}</td>
-                  <td>${empresa.Correo}</td>
-                  <td>${empresa.Direccion}</td>
-                  <td>${empresa.Celular}</td>
-                </tr>
-              </tbody>
-            </table>
-          `;
-          document.getElementById('companyTable').innerHTML = table;
         }
-      });
-  }
+
+        // Aplicar color guardado desde localStorage si existe
+        const savedColor = localStorage.getItem('colorPrimario');
+        if (savedColor && document.getElementById('colorPrimario')) {
+          document.getElementById('colorPrimario').value = `#${savedColor}`;
+        }
+
+        const table = `
+          <h3>Empresa Registrada</h3>
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Dirección Fiscal</th>
+                <th>Celular</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${empresa.RUC}</td>
+                <td>${empresa.Nombre}</td>
+                <td>${empresa.Correo}</td>
+                <td>${empresa.Direccion}</td>
+                <td>${empresa.Celular}</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+        document.getElementById('companyTable').innerHTML = table;
+      }
+    });
+}
+
 
   loadCompany();
 
@@ -526,13 +538,38 @@
   const companyForm = document.getElementById('companyForm');
 
   editBtn.addEventListener('click', () => {
-    const visible = companyForm.style.display === 'block';
-    companyForm.style.display = visible ? 'none' : 'block';
-    editBtn.textContent = visible ? 'Editar Empresa' : 'Cancelar Edición';
-    if (!visible) {
-      window.scrollTo({ top: companyForm.offsetTop - 50, behavior: 'smooth' });
-    }
-  });
+  const visible = companyForm.style.display === 'block';
+  companyForm.style.display = visible ? 'none' : 'block';
+  editBtn.textContent = visible ? 'Editar Empresa' : 'Cancelar Edición';
+
+  if (!visible) {
+    fetch('../actions/mycompany.php?action=get')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.empresa) {
+          const empresa = data.empresa;
+          for (let campo in empresa) {
+            const input = document.getElementById(campo.toLowerCase());
+            if (input) {
+              input.value = empresa[campo];
+            }
+          }
+
+          // Cargar el color desde localStorage si está disponible
+          const savedColor = localStorage.getItem('colorPrimario');
+          if (savedColor && document.getElementById('colorPrimario')) {
+            document.getElementById('colorPrimario').value = `#${savedColor}`;
+          }
+        } else {
+          showToast('Error al cargar los datos de la empresa.', 'error');
+        }
+      });
+
+    window.scrollTo({ top: companyForm.offsetTop - 50, behavior: 'smooth' });
+  }
+});
+
+
 
   // Función para mostrar un toast
   function showToast(message, type = 'success') {
@@ -565,7 +602,24 @@ companyForm.addEventListener('submit', function (e) {
 
   // Obtener el valor del input de color
   const colorInput = document.getElementById('colorPrimario');
+  const hexInput = document.getElementById('colorHexValue');
   let colorValue = colorInput.value.trim().replace('#', ''); // Eliminar el '#' si lo tiene
+  hexInput.value = colorInput.value;
+
+  colorInput.addEventListener('input', () => {
+  hexInput.value = colorInput.value;
+});
+
+// Cuando el usuario escribe un valor hexadecimal manualmente
+hexInput.addEventListener('input', () => {
+  let val = hexInput.value.trim();
+
+  // Validar que sea un color hexadecimal
+  if (/^#?[0-9A-Fa-f]{6}$/.test(val)) {
+    if (!val.startsWith('#')) val = '#' + val;
+    colorInput.value = val;
+  }
+});
 
   // Validar el color hexadecimal
   if (/^[0-9A-Fa-f]{6}$/.test(colorValue)) {
