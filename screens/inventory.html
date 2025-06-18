@@ -194,7 +194,7 @@
     }
 
     .toast {
-      background: #333;
+      background: #2d0152e3;
       color: #fff;
       padding: 15px 20px;
       border-radius: 6px;
@@ -244,7 +244,7 @@
     }
     
     .toast button:hover {
-      background-color: rgba(255,255,255,0.3);
+      background-color: #ffffff4d;
     }
 
     fieldset {
@@ -287,11 +287,11 @@
     }
 
     .toast.confirm button.yes {
-        background-color: #28a745;
+        background-color: #087030;
     }
 
     .toast.confirm button.no {
-        background-color: #dc3545;
+        background-color: #990917;
     }
 
     .search-bar {
@@ -812,12 +812,18 @@ function updateExistingInventory(productId, additionalStock, minStock, productNa
     });
 }
 
+let isConfirmVisible = false; // ← Flag global para evitar múltiples confirmaciones
+
 function showConfirmDialog(message, confirmText, cancelText, confirmCallback, cancelCallback) {
     const container = document.getElementById('toastContainer');
     if (!container) {
         console.error("No se encontró el contenedor de toasts");
         return;
     }
+
+    // Evitar múltiples confirmaciones al mismo tiempo
+    if (isConfirmVisible) return;
+    isConfirmVisible = true;
 
     const toast = document.createElement('div');
     toast.className = 'toast confirm';
@@ -830,13 +836,15 @@ function showConfirmDialog(message, confirmText, cancelText, confirmCallback, ca
     `;
 
     // Agregar eventos a los botones
-    toast.querySelector('.yes').onclick = function() {
+    toast.querySelector('.yes').onclick = function () {
         toast.remove();
+        isConfirmVisible = false; // ← Libera el flag
         confirmCallback();
     };
-    
-    toast.querySelector('.no').onclick = function() {
+
+    toast.querySelector('.no').onclick = function () {
         toast.remove();
+        isConfirmVisible = false; // ← También lo libera si se cancela
         cancelCallback();
     };
 
@@ -864,6 +872,7 @@ function showToast(message, type = 'info', duration = 3000) {
         }
     }, duration);
 }
+
 
 // Manejar clic en botones de editar
 $(document).on('click', '.edit-btn', function() {

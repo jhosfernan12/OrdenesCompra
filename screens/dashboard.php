@@ -51,7 +51,7 @@ if (!isset($_SESSION['usuario'])) {
             transition: background-color 0.3s ease;
         }
         .sidebar a:hover {
-            background-color:#a148ad;
+            background-color: #a148ad;
         }
         .main-content {
             margin-left: 250px;
@@ -62,7 +62,7 @@ if (!isset($_SESSION['usuario'])) {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .top-bar {
-            background-color: rgba(237, 228, 245, 0.9);
+            background-color: #ede4f5;
             border-radius: 10px;
             padding: 20px;
             display: flex;
@@ -80,9 +80,10 @@ if (!isset($_SESSION['usuario'])) {
             font-size: 1em;
             color: #333;
             cursor: pointer;
+             
         }
         .top-bar .menu-item a {
-            color: rgb(255, 255, 255);
+            color: #ffffff;
             text-decoration: none;
         }
         .dashboard-buttons {
@@ -125,7 +126,7 @@ if (!isset($_SESSION['usuario'])) {
         }
         .success {
             background-color: rgba(235, 230, 249, 0.9);
-            color:rgb(109, 20, 182);
+            color: #572970;
             border: 1px solid rgb(180, 165, 214)
         }
         .chart-container {
@@ -178,7 +179,8 @@ if (!isset($_SESSION['usuario'])) {
             </div>
 
             <div id="message" class="message success" style="display: none;">
-                ¡Bienvenido a tu panel de control!
+                ¡Bienvenido al panel de control!
+                Tu rol actual es: <?php echo htmlspecialchars($_SESSION['rol']); ?>
             </div>
              <div style="margin-top: 10px; max-width: 500px;">
     <h2 style="color: #562870; margin-bottom: 15px;">Órdenes por mes</h2>

@@ -138,7 +138,7 @@ class PDF extends FPDF {
         $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(...$this->colorPrimario);
         $this->SetFillColor(...$this->colorFondoClaro);
-         $this->SetTextColor(255, 255, 255);
+         $this->SetTextColor(0, 0, 0);
         $this->SetXY(120, 10);
         $this->Cell(70, 10, utf8_decode('ORDEN DE COMPRA N°'.str_pad($this->orderId, 4, '0', STR_PAD_LEFT)), 1, 2, 'C', true);
         $this->SetFont('Arial', 'B', 12);
@@ -194,9 +194,7 @@ $pdf->SetFont('Arial', '', 12);
 $pdf->Cell(0, 7, $orderData['order']['FechaOrden'], 0, 1);
 
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(40, 7, utf8_decode('Estado:'), 0, 0);
 $pdf->SetFont('Arial', '', 12);
-$pdf->Cell(0, 7, utf8_decode($orderData['order']['Estado']), 0, 1);
 
 $pdf->SetFont('Arial', 'B', 12);
 $pdf->Cell(40, 7, utf8_decode('Solicitante:'), 0, 0);
@@ -266,6 +264,10 @@ $pdf->Cell(40, 13, utf8_decode('Total'), 1, 1, 'C', true);
 $pdf->SetFont('Arial', '', 11);
 $total = 0;
 foreach ($orderData['products'] as $producto) {
+    if ($pdf->GetY() > ($pdf->GetPageHeight() - 50)) {
+        $pdf->AddPage();
+        $pdf->Ln(15);
+    }
     $subtotalItem = $producto['Cantidad'] * $producto['PrecioUnitario'];
     $total += $subtotalItem;
 

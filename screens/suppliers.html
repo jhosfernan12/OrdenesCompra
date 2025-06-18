@@ -212,7 +212,7 @@
         }
 
         .toast {
-            background: #333;
+            background: #2d0152e3;
             color: #fff;
             padding: 15px 20px;
             border-radius: 6px;
@@ -262,41 +262,39 @@
         }
         
         .toast button:hover {
-            background-color: rgba(255,255,255,0.3);
-        }
+      background-color: #6a00854d;
+    }
 
         /* Confirmación */
         .toast.confirm {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 15px 20px 10px;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        
-        .toast.confirm-buttons {
-            align-self: stretch;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            width: 100%;
-        }
-        
-        .toast.confirm button {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            font-weight: 600;
-            padding: 8px 14px;
-        }
-        
-        .toast.confirm button.yes:hover {
-            background-color: #28a745;
-        }
-        
-        .toast.confirm button.no:hover {
-            background-color: #dc3545;
-        }
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px 20px 10px 20px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .toast.confirm-buttons {
+      align-self: stretch;
+      display: flex;
+      justify-content: auto;
+      width: 85%;
+    }
+    .toast.confirm button {
+      background-color: rgba(255,255,255,0.2);
+      color: white;
+      font-weight: 600;
+      margin-left: -7px;
+
+      padding: 8px 45px;
+    }
+    .toast.confirm button.yes:hover {
+      background-color: #087030;
+    }
+    .toast.confirm button.no:hover {
+      background-color: #990917;
+    }
 
         /* Enlaces en celdas */
         td a {
@@ -438,42 +436,50 @@
             }, duration);
         }
 
-        function showConfirm(message) {
-            return new Promise((resolve) => {
-                const toast = document.createElement('div');
-                toast.className = 'toast confirm';
-                toast.setAttribute('role', 'alertdialog');
+      let isConfirmVisible = false;
+    //Función para mostrar confirmación personalizada
+    function showConfirm(message) {
+      return new Promise((resolve) => {
+        if (isConfirmVisible) return;
+        isConfirmVisible = true;
 
-                const msgSpan = document.createElement('div');
-                msgSpan.textContent = message;
-                toast.appendChild(msgSpan);
+        const toast = document.createElement('div');
+        toast.className = 'toast confirm';
+        toast.setAttribute('role', 'alertdialog');
+        toast.setAttribute('aria-modal', 'true');
 
-                const btnsDiv = document.createElement('div');
-                btnsDiv.className = 'toast confirm-buttons';
+        const msgSpan = document.createElement('div');
+        msgSpan.textContent = message;
+        toast.appendChild(msgSpan);
 
-                const yesBtn = document.createElement('button');
-                yesBtn.textContent = 'Sí';
-                yesBtn.className = 'yes';
-                yesBtn.onclick = () => {
-                    toastContainer.removeChild(toast);
-                    resolve(true);
-                };
+        const btnsDiv = document.createElement('div');
+        btnsDiv.className = 'toast confirm-buttons';
 
-                const noBtn = document.createElement('button');
-                noBtn.textContent = 'No';
-                noBtn.className = 'no';
-                noBtn.onclick = () => {
-                    toastContainer.removeChild(toast);
-                    resolve(false);
-                };
+        const yesBtn = document.createElement('button');
+        yesBtn.textContent = 'Sí';
+        yesBtn.className = 'yes';
+        yesBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea para permitir otra confirmación
+          resolve(true);
+        };
 
-                btnsDiv.appendChild(noBtn);
-                btnsDiv.appendChild(yesBtn);
-                toast.appendChild(btnsDiv);
+        const noBtn = document.createElement('button');
+        noBtn.textContent = 'No';
+        noBtn.className = 'no';
+        noBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea también si elige "No"
+          resolve(false);
+        };
 
-                toastContainer.appendChild(toast);
-            });
-        }
+        btnsDiv.appendChild(noBtn);
+        btnsDiv.appendChild(yesBtn);
+        toast.appendChild(btnsDiv);
+
+        toastContainer.appendChild(toast);
+      });
+    }
 
         async function loadSuppliers() {
             try {

@@ -286,13 +286,13 @@ a:hover {
     font-size: 1.1em;
     padding: 6px 12px;
     border-radius: 8px;
-    background-color: #a3a3a3;
+    background-color: #572970;
     transition: background-color 0.3s ease;
 }
 
 .top-bar .menu-item a:hover {
-    background-color: #a3a3a3;
-    padding: 6px 12px;
+    background-color: #572970;
+    padding: 6px 20px;
     border-radius: 8px;
 }
 

@@ -189,7 +189,7 @@
 
     /* Estilo general toast */
     .toast {
-      background: #333;
+      background: #2d0152e3;
       color: #fff;
       padding: 15px 20px;
       border-radius: 6px;
@@ -236,7 +236,7 @@
       transition: background-color 0.2s ease;
     }
     .toast button:hover {
-      background-color: #ffffff4d;
+      background-color: #6a00854d;
     }
 
     /* Estilos confirmación en toast */
@@ -252,21 +252,22 @@
     .toast.confirm-buttons {
       align-self: stretch;
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      width: 100%;
+      justify-content: auto;
+      width: 85%;
     }
     .toast.confirm button {
       background-color: rgba(255,255,255,0.2);
       color: white;
       font-weight: 600;
-      padding: 8px 14px;
+      margin-left: -7px;
+
+      padding: 8px 45px;
     }
     .toast.confirm button.yes:hover {
-      background-color: #28a745;
+      background-color: #087030;
     }
     .toast.confirm button.no:hover {
-      background-color: #dc3545;
+      background-color: #990917;
     }
   </style>
 </head>
@@ -377,10 +378,16 @@
       }, duration);
     }
 
+
     // Función para mostrar confirmación personalizada
     // Retorna Promise que se resuelve true o false según respuesta del usuario
+    let isConfirmVisible = false;
+    //Función para mostrar confirmación personalizada
     function showConfirm(message) {
       return new Promise((resolve) => {
+        if (isConfirmVisible) return;
+        isConfirmVisible = true;
+
         const toast = document.createElement('div');
         toast.className = 'toast confirm';
         toast.setAttribute('role', 'alertdialog');
@@ -398,6 +405,7 @@
         yesBtn.className = 'yes';
         yesBtn.onclick = () => {
           if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea para permitir otra confirmación
           resolve(true);
         };
 
@@ -406,6 +414,7 @@
         noBtn.className = 'no';
         noBtn.onclick = () => {
           if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea también si elige "No"
           resolve(false);
         };
 
@@ -416,6 +425,7 @@
         toastContainer.appendChild(toast);
       });
     }
+
 
     function renderUsers() {
       usersTableBody.innerHTML = '';

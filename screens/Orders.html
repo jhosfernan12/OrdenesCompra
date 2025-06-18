@@ -311,7 +311,7 @@
         }
         
         .toast {
-            background: #333;
+            background: #2d0152e3;
             color: #fff;
             padding: 15px 20px;
             border-radius: 6px;
@@ -330,13 +330,20 @@
             from { opacity: 0; transform: translateX(100%); }
             to { opacity: 0.95; transform: translateX(0); }
         }
+
+        .toast.confirm button.yes:hover {
+      background-color: #087030;
+    }
+    .toast.confirm button.no:hover {
+      background-color: #990917;
+    }
         
         .toast.success {
-            background-color: #28a745;
+            background-color: #087030;
         }
         
         .toast.error {
-            background-color: #dc3545;
+            background-color: #990917;
         }
         
         .toast.info {
@@ -387,6 +394,27 @@
                 overflow-x: auto;
             }
         }
+
+        .status-pending {
+            color: #d4a017; /* mostaza */
+            font-weight: bold;
+        }
+
+        .status-delivered {
+            color: #00c400; /* verde oscuro */
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #cc5500; /* naranja oscuro */
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #b22222; /* rojo (firebrick) */
+            font-weight: bold;
+        }
+
         
         /* Efectos de carga */
         .loading {
@@ -625,43 +653,50 @@
         }
         
         // Función para confirmación con toast
-        function showConfirm(message) {
-            return new Promise((resolve) => {
-                const toast = document.createElement('div');
-                toast.className = 'toast confirm';
-                toast.setAttribute('role', 'alertdialog');
-                toast.setAttribute('aria-modal', 'true');
+       let isConfirmVisible = false;
+    //Función para mostrar confirmación personalizada
+    function showConfirm(message) {
+      return new Promise((resolve) => {
+        if (isConfirmVisible) return;
+        isConfirmVisible = true;
 
-                const msgSpan = document.createElement('div');
-                msgSpan.textContent = message;
-                toast.appendChild(msgSpan);
+        const toast = document.createElement('div');
+        toast.className = 'toast confirm';
+        toast.setAttribute('role', 'alertdialog');
+        toast.setAttribute('aria-modal', 'true');
 
-                const btnsDiv = document.createElement('div');
-                btnsDiv.className = 'toast confirm-buttons';
+        const msgSpan = document.createElement('div');
+        msgSpan.textContent = message;
+        toast.appendChild(msgSpan);
 
-                const yesBtn = document.createElement('button');
-                yesBtn.textContent = 'Sí';
-                yesBtn.className = 'yes';
-                yesBtn.onclick = () => {
-                    if (toast.parentNode) toastContainer.removeChild(toast);
-                    resolve(true);
-                };
+        const btnsDiv = document.createElement('div');
+        btnsDiv.className = 'toast confirm-buttons';
 
-                const noBtn = document.createElement('button');
-                noBtn.textContent = 'No';
-                noBtn.className = 'no';
-                noBtn.onclick = () => {
-                    if (toast.parentNode) toastContainer.removeChild(toast);
-                    resolve(false);
-                };
+        const yesBtn = document.createElement('button');
+        yesBtn.textContent = 'Sí';
+        yesBtn.className = 'yes';
+        yesBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea para permitir otra confirmación
+          resolve(true);
+        };
 
-                btnsDiv.appendChild(noBtn);
-                btnsDiv.appendChild(yesBtn);
-                toast.appendChild(btnsDiv);
+        const noBtn = document.createElement('button');
+        noBtn.textContent = 'No';
+        noBtn.className = 'no';
+        noBtn.onclick = () => {
+          if (toast.parentNode) toastContainer.removeChild(toast);
+          isConfirmVisible = false; // ← Desbloquea también si elige "No"
+          resolve(false);
+        };
 
-                toastContainer.appendChild(toast);
-            });
-        }
+        btnsDiv.appendChild(noBtn);
+        btnsDiv.appendChild(yesBtn);
+        toast.appendChild(btnsDiv);
+
+        toastContainer.appendChild(toast);
+      });
+    }
         
         // Función para cargar las órdenes
         async function loadOrders(filter = '') {
@@ -993,7 +1028,6 @@
                 const user = data.user || {};
                 document.getElementById('viewUserInfo').innerHTML = `
                     <p><strong>Nombre:</strong> ${user.Nombre || 'N/A'}</p>
-                    <p><strong>Correo:</strong> ${user.Correo || 'N/A'}</p>
                 `;
                 
                 // Productos
