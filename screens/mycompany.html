@@ -327,11 +327,11 @@
         }
         
         .toast.success {
-            background-color: #28a745;
+            background-color: #087030;
         }
         
         .toast.error {
-            background-color: #dc3545;
+            background-color: #990917;
         }
         
         .toast.info {
@@ -560,9 +560,9 @@ function loadCompany() {
           if (savedColor && document.getElementById('colorPrimario')) {
             document.getElementById('colorPrimario').value = `#${savedColor}`;
           }
-        } else {
-          showToast('Error al cargar los datos de la empresa.', 'error');
-        }
+        } 
+        
+        
       });
 
     window.scrollTo({ top: companyForm.offsetTop - 50, behavior: 'smooth' });

@@ -180,7 +180,7 @@ if (!isset($_SESSION['usuario'])) {
 
             <div id="message" class="message success" style="display: none;">
                 ¡Bienvenido al panel de control!
-                Tu rol actual es: <?php echo htmlspecialchars($_SESSION['rol']); ?>
+                Actualmente eres <?php echo htmlspecialchars($_SESSION['rol']); ?>
             </div>
              <div style="margin-top: 10px; max-width: 500px;">
     <h2 style="color: #562870; margin-bottom: 15px;">Órdenes por mes</h2>
