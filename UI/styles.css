@@ -188,7 +188,7 @@ a:hover {
 
 /* Ajuste para acercar más los campos */
 #usuario {
-    margin-bottom: 0px; /* Eliminamos margen para ajustarse a la contraseña */
+    margin-bottom: 15px; /* Eliminamos margen para ajustarse a la contraseña */
 }
 
 /* Estilos del dashboard */

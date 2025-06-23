@@ -1,6 +1,9 @@
 <?php
 
 require_once __DIR__.'/../includes/fpdf/fpdf.php';
+
+
+
 if (isset($_GET['check']) && $_GET['check'] == '1') {
     header('Content-Type: application/json');
 
@@ -106,6 +109,79 @@ function hexToRgb($hex) {
     
     return [$r, $g, $b];
 }
+$monedaTexto = '';
+switch ($orderData['order']['Moneda']) {
+    case 'USD':
+        $monedaTexto = 'DOLARES';
+        break;
+    case 'PEN':
+        $monedaTexto = 'SOLES';
+        break;
+    default:
+        $monedaTexto = $orderData['order']['Moneda']; // Por defecto mostrar la misma sigla
+}
+
+function numeroALetras($numero, $moneda = 'PEN') {
+    $unidades = [
+        '', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO',
+        'SEIS', 'SIETE', 'OCHO', 'NUEVE', 'DIEZ',
+        'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE',
+        'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'
+    ];
+    $decenas = [
+        '', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA',
+        'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'
+    ];
+    $centenas = [
+        '', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS',
+        'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS',
+        'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'
+    ];
+
+    $monedas = [
+        'PEN' => 'SOLES',
+        'USD' => 'DÓLARES'
+    ];
+    $monedaTexto = $monedas[$moneda] ?? 'SOLES';
+
+    $entero = floor($numero);
+    $decimales = round(($numero - $entero) * 100);
+
+    $letras = '';
+    if ($entero == 0) {
+        $letras = 'CERO';
+    } else {
+        $letras = convertirNumero($entero, $unidades, $decenas, $centenas);
+    }
+
+    return $letras . ' Y ' . str_pad($decimales, 2, '0', STR_PAD_LEFT) . '/100';
+}
+
+function convertirNumero($n, $unidades, $decenas, $centenas) {
+    if ($n < 20) {
+        return $unidades[$n];
+    } elseif ($n < 100) {
+        $d = floor($n / 10);
+        $r = $n % 10;
+        return $d == 2 && $r > 0
+            ? "VEINTI" . $unidades[$r]
+            : $decenas[$d] . ($r > 0 ? " Y " . $unidades[$r] : "");
+    } elseif ($n < 1000) {
+        $c = floor($n / 100);
+        $r = $n % 100;
+        return $n == 100
+            ? "CIEN"
+            : $centenas[$c] . ($r > 0 ? " " . convertirNumero($r, $unidades, $decenas, $centenas) : "");
+    } elseif ($n < 1000000) {
+        $m = floor($n / 1000);
+        $r = $n % 1000;
+        return ($m == 1 ? "MIL" : convertirNumero($m, $unidades, $decenas, $centenas) . " MIL") . ($r > 0 ? " " . convertirNumero($r, $unidades, $decenas, $centenas) : "");
+    } else {
+        return $n;
+    }
+}
+
+
 
 
 
@@ -298,6 +374,20 @@ $pdf->Cell(140, 8, utf8_decode('TOTAL '.$orderData['order']['Moneda'].':'), 1, 0
 $pdf->Cell(40, 8, number_format($totalFinal, 2).' '.$orderData['order']['Moneda'], 1, 1, 'R', true);
 $pdf->Ln(5);
 
+// Después de mostrar TOTAL en números:
+$pdf->Ln(5);
+
+// Convertir total a texto
+$totalLetras = numeroALetras(floor($totalFinal));
+
+// Imprimir
+$pdf->SetFont('Arial','B',11);
+$pdf->Cell(0,7, 'SON: '.$totalLetras.' '.$monedaTexto, 0, 1, 'L');
+
+
+
+
+
 $pdf->SetFont('Arial', '', 11);
 $pdf->MultiCell(0, 7, utf8_decode('Saludos cordiales.
 Atentamente,'), 0, 'L');
@@ -374,4 +464,8 @@ function getOrderData($conn, $orderId) {
         'admin' => ['Correo' => $adminCorreo]
     ];
 }
+
+
+
+
 ?>

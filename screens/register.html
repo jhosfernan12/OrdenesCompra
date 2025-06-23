@@ -39,6 +39,10 @@
       color: #1b5e20;
       border: 1px solid #a950dd;
     }
+
+     #usuario {
+      margin-top: -10px; /* Sube la caja de usuario */
+    }
   </style>
 </head>
 <body>
@@ -48,7 +52,16 @@
     <div id="response-message" class="message" style="display: none;"></div>
 
     <form method="POST" action="../actions/register.php">
-      <input type="text" id="usuario" name="usuario" placeholder="Nombre de Usuario" required /><br />
+      <input 
+      type="text" 
+      id="usuario" 
+      name="usuario" 
+      placeholder="Nombre de Usuario" 
+      required 
+      pattern="[A-Za-z0-9_]+" 
+      title="Solo letras, números y guiones bajos (sin espacios ni caracteres especiales)"
+    />
+
       <div class="password-container">
         <input type="password" id="contrasena" name="contrasena" placeholder="Contraseña" required />
         <img
